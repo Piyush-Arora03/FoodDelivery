@@ -36,13 +36,13 @@ class MainActivity : ComponentActivity() {
             }
             setOnExitAnimationListener{ screen->
                 val zoomX = ObjectAnimator.ofFloat(
-                    screen.iconView, View.SCALE_X, 0.5f, 0f
+                    screen.iconView, View.SCALE_X,0.5f,0.0f
                 )
                 val zoomY=ObjectAnimator.ofFloat(
-                    screen.iconView,View.SCALE_Y,0.5f,0f
+                    screen.iconView,View.SCALE_Y,0.5f,0.0f
                 )
-                zoomX.duration=500
-                zoomY.duration=500
+                zoomX.duration=1000
+                zoomY.duration=1000
                 zoomX.interpolator=OvershootInterpolator()
                 zoomY.interpolator=OvershootInterpolator()
                 zoomY.doOnEnd {
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            delay(3000)
+            delay(2000)
             showSplashScreen=false
         }
     }
