@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -56,4 +58,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.core.splashscreen)
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.compiler)
+    // Retrofit core library
+    implementation(libs.retrofit)
+    // Converter for JSON parsing using Gson
+    implementation(libs.converter.gson)
+    // Optional: For logging HTTP requests & responses
+    implementation(libs.logging.interceptor)
+}
+kapt {
+    correctErrorTypes=true
 }
