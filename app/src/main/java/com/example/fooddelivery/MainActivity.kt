@@ -8,19 +8,29 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.navigation.AuthScreen
+import com.example.fooddelivery.navigation.HomeScreen
+import com.example.fooddelivery.navigation.LogInScreen
+import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
+import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -66,8 +76,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             FoodDeliveryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AuthScreen()
-                    Box(modifier = Modifier.padding(innerPadding))
+                    val navController= rememberNavController()
+                    val navHost= NavHost(navController = navController, startDestination = AuthScreen, modifier = Modifier.padding(innerPadding)){
+                        composable<AuthScreen> {
+                            AuthScreen(navController)
+                        }
+                        composable<SignUpScreen> {
+                            SignUpScreen(navController=navController)
+                        }
+                        composable<HomeScreen> {
+                            Box(modifier = Modifier.fillMaxSize().
+                            background(color = Color.White))
+                        }
+                        composable<LogInScreen> {
+                            Box(modifier = Modifier.fillMaxSize().
+                            background(color = Color.Red))
+                        }
+                    }
                 }
             }
         }
@@ -81,18 +106,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     FoodDeliveryTheme {
-        Greeting("Android")
     }
 }
