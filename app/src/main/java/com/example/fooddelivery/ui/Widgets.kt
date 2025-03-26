@@ -1,5 +1,8 @@
 package com.example.fooddelivery.ui
 
+import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -37,7 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fooddelivery.R
+import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 
@@ -46,10 +52,11 @@ fun SocialButtons(
     icon:Int,
     text:Int,
     onClick:()->Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Button(onClick = onClick, colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        , modifier = modifier.padding(bottom = 8.dp)
+        , modifier = modifier
+            .padding(bottom = 8.dp)
             .shadow(10.dp, shape = RoundedCornerShape(32.dp))) {
         Row(modifier = Modifier.wrapContentWidth()) {
             Image(painter = painterResource(icon), contentDescription = null,
@@ -61,31 +68,41 @@ fun SocialButtons(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun GroupSocialButtons(
     text: Int=R.string.sign_in_with,
-    onFacebookClick:()->Unit,
-    onGoogleClick:()->Unit,
-    color:Color=Color.Gray
+    color:Color=Color.Gray,
+    viewModel: BaseAuthProviderViewModel
 ){
     Column() {
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 10.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
-            HorizontalDivider(modifier=Modifier.weight(1f).padding(horizontal = 10.dp),color=color)
+            HorizontalDivider(modifier=Modifier
+                .weight(1f)
+                .padding(horizontal = 10.dp),color=color)
             Text(text = stringResource(text), color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp))
-            HorizontalDivider(modifier=Modifier.weight(1f).padding(horizontal = 10.dp),color=color)
+            HorizontalDivider(modifier=Modifier
+                .weight(1f)
+                .padding(horizontal = 10.dp),color=color)
         }
         Spacer(modifier = Modifier.padding(vertical = 2.dp))
+        val context= LocalContext.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            SocialButtons(icon = R.drawable.ic_facebook,text = R.string.sign_in_with_facebook,onClick = onFacebookClick, modifier = Modifier
+            SocialButtons(icon = R.drawable.ic_facebook,text = R.string.sign_in_with_facebook,onClick ={
+                viewModel.onFacebookSignInClick(context as ComponentActivity)
+            }, modifier = Modifier
                 .weight(1f))
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
-            SocialButtons(icon = R.drawable.ic_google,text = R.string.sign_in_with_google,onClick = onGoogleClick, modifier = Modifier
+            SocialButtons(icon = R.drawable.ic_google,text = R.string.sign_in_with_google,onClick = {
+                viewModel.onGoogleSignInClick(context)
+            }, modifier = Modifier
                 .weight(1f))
         }
     }

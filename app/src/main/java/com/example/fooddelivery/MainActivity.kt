@@ -1,6 +1,7 @@
 package com.example.fooddelivery
 
 import android.animation.ObjectAnimator
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,6 +9,11 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +36,7 @@ import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
+import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +51,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var foodApi: FoodApi
     val TAG="MainActivity"
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -77,7 +85,31 @@ class MainActivity : ComponentActivity() {
             FoodDeliveryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController= rememberNavController()
-                    val navHost= NavHost(navController = navController, startDestination = AuthScreen, modifier = Modifier.padding(innerPadding)){
+                    val navHost= NavHost(navController = navController, startDestination = AuthScreen, modifier = Modifier.padding(innerPadding),
+                        enterTransition = {
+                           slideIntoContainer(
+                               towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                               animationSpec = tween(700),
+                           )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(700),
+                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(700),
+                            )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(700),
+                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                        }){
                         composable<AuthScreen> {
                             AuthScreen(navController)
                         }
@@ -89,8 +121,7 @@ class MainActivity : ComponentActivity() {
                             background(color = Color.White))
                         }
                         composable<LogInScreen> {
-                            Box(modifier = Modifier.fillMaxSize().
-                            background(color = Color.Red))
+                            SignInScreen(navController=navController)
                         }
                     }
                 }

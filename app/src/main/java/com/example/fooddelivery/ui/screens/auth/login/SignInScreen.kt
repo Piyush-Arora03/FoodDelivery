@@ -1,7 +1,9 @@
 package com.example.fooddelivery.ui.screens.auth.signup
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -34,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -57,6 +58,7 @@ import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.FoodHubTextFiled
 import com.example.fooddelivery.ui.GroupSocialButtons
+import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
@@ -65,8 +67,7 @@ import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: NavController) {
-    val name= viewModel.name.collectAsStateWithLifecycle()
+fun SignInScreen (viewModel: SignInViewModel= hiltViewModel(),navController: NavController) {
     val email= viewModel.email.collectAsStateWithLifecycle()
     val password= viewModel.password.collectAsStateWithLifecycle()
     val errorMessage= remember {
@@ -75,38 +76,38 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
     val loading= remember {
         mutableStateOf(false)
     }
-
+    val context= LocalContext.current
     when(viewModel.uiState.collectAsStateWithLifecycle().value){
-        SignUpViewModel.SignUpEvent.EventSuccess -> {
+        SignInViewModel.SignInEvent.EventSuccess ->{
             loading.value=false
             errorMessage.value=""
         }
-        SignUpViewModel.SignUpEvent.EventLoading -> {
+        SignInViewModel.SignInEvent.EventLoading -> {
             loading.value=true
             errorMessage.value=""
         }
-        SignUpViewModel.SignUpEvent.EventError -> {
+        SignInViewModel.SignInEvent.EventError -> {
             loading.value=false
-            errorMessage.value="Failed to sign up"
+            errorMessage.value="Failed to sign in"
         }
         else -> {
             loading.value=false
             errorMessage.value=""
         }
     }
-    val context= LocalContext.current
     LaunchedEffect(true) {
         viewModel.navigationEvent.collectLatest{ event ->
             when(event){
-                SignUpViewModel.SignUpNavigationEvent.NavigateToHome -> {
+                SignInViewModel.SignInNavigationEvent.NavigateToHome->{
                     navController.navigate(HomeScreen){
+                        Log.d("TAG","Navigating to home screen")
                         popUpTo(AuthScreen){
                             inclusive=true
                         }
                     }
                 }
-                SignUpViewModel.SignUpNavigationEvent.NavigateToLogin -> {
-                    navController.navigate(LogInScreen)
+                SignInViewModel.SignInNavigationEvent.NavigateToSignup->{
+                    navController.navigate(SignUpScreen)
                 }
             }
         }
@@ -123,7 +124,7 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text ="Sign Up",
+                text ="Login",
                 style = TextStyle(
                     fontSize = 35.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -133,17 +134,6 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
                 modifier = Modifier
                     .align(alignment = Alignment.Start)
                     .padding(start = 20.dp)
-            )
-            Spacer(modifier =Modifier.padding(bottom = 30.dp))
-            FoodHubTextFiled(
-                value = name.value,
-                onValueChange = {viewModel.onNameChange(it)},
-                label = {
-                    Text(text = stringResource(R.string.full_name), color = Color.Gray)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-                maxLines = 1
             )
             Spacer(modifier =Modifier.padding(bottom = 30.dp))
             FoodHubTextFiled(
@@ -172,7 +162,7 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
             )
             Spacer(modifier =Modifier.padding(bottom = 50.dp))
             Button(onClick = {
-                viewModel.onSignUpClick()
+                viewModel.onSignInClick()
             }, colors = ButtonDefaults.buttonColors(Orange),
                 modifier = Modifier
                     .fillMaxWidth(0.6f)) {
@@ -181,7 +171,7 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
                         targetState = loading.value,
                         transitionSpec = {
                             fadeIn(animationSpec = tween(300))+ scaleIn(initialScale = 0.8f) togetherWith
-                            fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.8f)
+                                    fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.8f)
                         }
                     ) { target->
                         if(target){
@@ -202,11 +192,11 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
                 }
             }
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
-            Text(text = stringResource(R.string.already_have_an_account), modifier = Modifier.clickable {
-                viewModel.onLoginClick()
+            Text(text = stringResource(R.string.dont_have_an_account), modifier = Modifier.clickable {
+                viewModel.onSignUpClick()
             })
             Spacer(modifier = Modifier.padding(bottom = 50.dp))
-            GroupSocialButtons(text= R.string.sign_in_with,viewModel = viewModel)
+            GroupSocialButtons(text= R.string.sign_in_with, viewModel = viewModel)
             Spacer(modifier = Modifier.padding(bottom = 20.dp))
         }
     }

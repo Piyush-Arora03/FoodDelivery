@@ -11,4 +11,7 @@
     <string name="email">E-mail</string>
     <string name="full_name">Full Name</string>
     <string name="dont_have_an_account">Don\'t have an account ? SignUp</string>
+    <string name="facebook_app_id">1360887365037016</string>
+    <string name="fb_login_protocol_scheme">820fb20976530320124a5ad3305f6acd</string>
+    <string name="facebook_client_token">56789</string>
 </resources>

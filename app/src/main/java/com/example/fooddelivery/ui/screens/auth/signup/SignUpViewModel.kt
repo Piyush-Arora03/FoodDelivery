@@ -1,9 +1,16 @@
 package com.example.fooddelivery.ui.screens.auth.signup
 
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.modle.SignUpRequest
+import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
+import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel.SignInEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(val foodApi: FoodApi): ViewModel() {
+class SignUpViewModel @Inject constructor(override val foodApi: FoodApi): BaseAuthProviderViewModel(foodApi){
 
     private val _uiState= MutableStateFlow<SignUpEvent>(SignUpEvent.EventNothing)
     val uiState=_uiState.asStateFlow()
@@ -80,5 +87,34 @@ class SignUpViewModel @Inject constructor(val foodApi: FoodApi): ViewModel() {
         object EventSuccess: SignUpEvent()
         object EventError: SignUpEvent()
         object EventNothing: SignUpEvent()
+    }
+
+    override fun loading() {
+        viewModelScope.launch {
+            Log.d(TAG,"loading")
+            _uiState.value= SignUpEvent.EventLoading
+        }
+    }
+
+    override fun socialAuthSuccess(msg: String) {
+        viewModelScope.launch {
+            Log.d(TAG,"socialAuthSuccess")
+            _uiState.value= SignUpEvent.EventSuccess
+            _navigationEvent.emit(SignUpNavigationEvent.NavigateToHome)
+        }
+    }
+
+    override fun googleError(msg: String) {
+        viewModelScope.launch {
+            Log.d(TAG,"googleError")
+            _uiState.value= SignUpEvent.EventError
+        }
+    }
+
+    override fun facebookError(msg: String) {
+        viewModelScope.launch {
+            Log.d(TAG,"facebookError")
+            _uiState.value= SignUpEvent.EventError
+        }
     }
 }
