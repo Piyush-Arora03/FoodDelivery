@@ -60,7 +60,7 @@ class SignInViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
                     email.value,password.value
                 )
                 )
-                if(response.token.isNotEmpty()){
+                if(response.body()!!.token.isNotEmpty()){
                     _uiState.value=SignInEvent.EventSuccess
                     _navigationEvent.emit(SignInNavigationEvent.NavigateToHome)
                 }

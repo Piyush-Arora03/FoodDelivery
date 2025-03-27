@@ -2,7 +2,6 @@ package com.example.fooddelivery.ui.screens.auth
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.credentials.CredentialManager
@@ -11,16 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.auth.GoogleUiProvider
 import com.example.fooddelivery.data.modle.OAuthRequest
-import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel.SignInEvent
-import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel.SignInNavigationEvent
+import com.example.fooddelivery.data.remote.ApiResponses
+import com.example.fooddelivery.data.remote.SafeApiCalls
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 abstract class BaseAuthProviderViewModel(open val foodApi: FoodApi) : ViewModel() {
     val TAG="BaseAuthProviderViewModel"
@@ -46,20 +43,7 @@ abstract class BaseAuthProviderViewModel(open val foodApi: FoodApi) : ViewModel(
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(response: LoginResult) {
                     viewModelScope.launch {
-                        if(response!=null){
-                            val data= OAuthRequest(
-                                response.accessToken.token.toString(),
-                                provider = "facebook"
-                            )
-                            val res=foodApi.oAuthRequest(data)
-                            if(res.token.isNotEmpty()){
-                                Log.d(TAG,response.accessToken.token.toString())
-                                socialAuthSuccess(res.token)
-                            }else{
-                                Log.d(TAG,"error fetching token from backend for facebook")
-                                facebookError("facebook error")
-                            }
-                        }
+                        fetchApiData(response.accessToken.toString(), "google", ::googleError)
                     }
                     // App code
                 }
@@ -83,29 +67,44 @@ abstract class BaseAuthProviderViewModel(open val foodApi: FoodApi) : ViewModel(
     private fun onInitiateGoogleSignIn(context: Context) {
         viewModelScope.launch {
             loading()
-            try{
-                val response=googleAuthUiProvider.signInWithGoogle(
+            try {
+                val response = googleAuthUiProvider.signInWithGoogle(
                     context,
                     CredentialManager.create(context)
                 )
-                if(response!=null){
-                    val data=OAuthRequest(
-                        response.token.toString(),
-                        provider = "google"
-                    )
-                    val res=foodApi.oAuthRequest(data)
-                    if(res.token.isNotEmpty()){
-                        Log.d(TAG,res.token)
-                        socialAuthSuccess(res.token)
-                        Log.d(TAG,"Success Google Sign In")
-                    }else{
-                        Log.d(TAG,"error fetching token from backend for google")
-                        googleError("google error")
-                    }
+                if (response != null) {
+                    fetchApiData(response.token.toString(), "google", ::googleError)
                 }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 googleError("google error $e")
                 e.printStackTrace()
+            }
+        }
+    }
+    private fun fetchApiData(token: String,provider:String,onError:(String)->Unit){
+        viewModelScope.launch {
+            val data = OAuthRequest(
+                token.toString(),
+                provider = provider
+            )
+            val res = SafeApiCalls { foodApi.oAuthRequest(data) }
+            when (res) {
+                is ApiResponses.Success -> {
+                    socialAuthSuccess(res.data.token)
+                }
+                else -> {
+                    val error = (res as? ApiResponses.Error)?.code
+                    if (error != null) {
+                        when (error) {
+                            404 -> onError("user not found")
+                            401 -> onError("unauthorized")
+                            500 -> onError("internal server error")
+                            else -> onError("something went wrong")
+                        }
+                    } else {
+                        onError("error code null")
+                    }
+                }
             }
         }
     }

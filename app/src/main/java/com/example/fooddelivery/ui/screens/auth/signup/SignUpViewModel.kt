@@ -57,7 +57,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
                 val response=foodApi.signUpRequest(SignUpRequest(
                     name.value,email.value,password.value
                 ))
-                if(response.token.isNotEmpty()){
+                if(response.body()!!.token.isNotEmpty()){
                     _uiState.value=SignUpEvent.EventSuccess
                     _navigationEvent.emit(SignUpNavigationEvent.NavigateToHome)
                 }
