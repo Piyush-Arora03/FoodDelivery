@@ -1,6 +1,7 @@
 package com.example.fooddelivery
 
 import android.animation.ObjectAnimator
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,19 +9,37 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.FoodHubAuthSession
+import com.example.fooddelivery.navigation.AuthScreen
+import com.example.fooddelivery.navigation.HomeScreen
+import com.example.fooddelivery.navigation.LogInScreen
+import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
+import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
+import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +52,10 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var foodApi: FoodApi
+    @Inject
+    lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,8 +88,46 @@ class MainActivity : ComponentActivity() {
         setContent {
             FoodDeliveryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AuthScreen()
-                    Box(modifier = Modifier.padding(innerPadding))
+                    val navController= rememberNavController()
+                    val navHost= NavHost(navController = navController, startDestination =
+                        if (session.getToken()!=null) HomeScreen else AuthScreen, modifier = Modifier.padding(innerPadding),
+                        enterTransition = {
+                           slideIntoContainer(
+                               towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                               animationSpec = tween(700),
+                           )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(700),
+                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(700),
+                            )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(700),
+                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                        }){
+                        composable<AuthScreen> {
+                            AuthScreen(navController)
+                        }
+                        composable<SignUpScreen> {
+                            SignUpScreen(navController=navController)
+                        }
+                        composable<HomeScreen> {
+                            HomeScreen(navController=navController)
+                        }
+                        composable<LogInScreen> {
+                            SignInScreen(navController=navController)
+                        }
+                    }
                 }
             }
         }
@@ -81,18 +141,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     FoodDeliveryTheme {
-        Greeting("Android")
     }
 }

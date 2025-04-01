@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#F44336"
+        android:pathData="M44,24c0,11.045 -8.955,20 -20,20c-11.045,0 -20,-8.955 -20,-20c0,-11.045 8.955,-20 20,-20c11.045,0 20,8.955 20,20z" />
+
+    <!-- First Cross Line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M29.656,15.516l2.828,2.828l-14.14,14.14l-2.828,-2.828z" />
+
+    <!-- Second Cross Line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32.484,29.656l-2.828,2.828l-14.14,-14.14l2.828,-2.828z" />
+
+</vector>
