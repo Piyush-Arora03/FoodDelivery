@@ -9,6 +9,7 @@ import androidx.credentials.CredentialManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.auth.GoogleUiProvider
 import com.example.fooddelivery.data.modle.OAuthRequest
 import com.example.fooddelivery.data.modle.SignInRequest
@@ -30,7 +31,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(override val foodApi: FoodApi): BaseAuthProviderViewModel(foodApi = foodApi) {
+class SignInViewModel @Inject constructor(override val foodApi: FoodApi,private val session: FoodHubAuthSession): BaseAuthProviderViewModel(foodApi = foodApi) {
 
     private val _uiState= MutableStateFlow<SignInEvent>(SignInEvent.EventNothing)
     val uiState=_uiState.asStateFlow()
@@ -62,6 +63,7 @@ class SignInViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
                 )
                 if(response.body()!!.token.isNotEmpty()){
                     _uiState.value=SignInEvent.EventSuccess
+                    session.saveToken(response.body()!!.token)
                     _navigationEvent.emit(SignInNavigationEvent.NavigateToHome)
                 }
                 else{
@@ -99,6 +101,7 @@ class SignInViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
 
     override fun socialAuthSuccess(token: String) {
         viewModelScope.launch {
+            session.saveToken(token)
             _uiState.value=SignInEvent.EventSuccess
             _navigationEvent.emit(SignInNavigationEvent.NavigateToHome)
         }

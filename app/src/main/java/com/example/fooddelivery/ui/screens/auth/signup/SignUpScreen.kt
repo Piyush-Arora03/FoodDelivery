@@ -1,7 +1,6 @@
 package com.example.fooddelivery.ui.screens.auth.signup
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -23,12 +22,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,29 +45,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.R
-import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
-import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.FoodHubTextFiled
 import com.example.fooddelivery.ui.GroupSocialButtons
-import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Inject
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: NavController) {
+    val sheetState= rememberModalBottomSheetState()
+    val scope= rememberCoroutineScope()
+    val showDialog= remember {
+        mutableStateOf(false)
+    }
     val name= viewModel.name.collectAsStateWithLifecycle()
     val email= viewModel.email.collectAsStateWithLifecycle()
     val password= viewModel.password.collectAsStateWithLifecycle()
@@ -89,7 +94,12 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
             loading.value=false
             errorMessage.value="Failed to sign up"
         }
-        else -> {
+        SignUpViewModel.SignUpEvent.ShowErrorDialog-> {
+            loading.value=false
+            errorMessage.value=""
+            showDialog.value=true
+        }
+        else ->{
             loading.value=false
             errorMessage.value=""
         }
@@ -208,6 +218,18 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
             Spacer(modifier = Modifier.padding(bottom = 50.dp))
             GroupSocialButtons(text= R.string.sign_in_with,viewModel = viewModel)
             Spacer(modifier = Modifier.padding(bottom = 20.dp))
+        }
+    }
+    if(showDialog.value){
+        ModalBottomSheet(onDismissRequest = { showDialog.value=false }, sheetState = sheetState) {
+            BasicDialog(
+                msg = viewModel.msg, dis = viewModel.dis, onClick =
+                {
+                    scope.launch {
+                        sheetState.hide()
+                        showDialog.value=false
+                    }
+            })
         }
     }
 }

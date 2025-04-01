@@ -88,6 +88,9 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation("com.facebook.android:facebook-login:16.0.1")
+    implementation("io.coil-kt:coil-compose:2.2.0")
+
+
 }
 kapt {
     correctErrorTypes=true

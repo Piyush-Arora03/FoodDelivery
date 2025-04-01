@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.modle.SignUpRequest
 import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
 import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel.SignInEvent
@@ -21,8 +22,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(override val foodApi: FoodApi): BaseAuthProviderViewModel(foodApi){
-
+class SignUpViewModel @Inject constructor(override val foodApi: FoodApi,private val session: FoodHubAuthSession): BaseAuthProviderViewModel(foodApi){
+    var msg=""
+    var dis=""
     private val _uiState= MutableStateFlow<SignUpEvent>(SignUpEvent.EventNothing)
     val uiState=_uiState.asStateFlow()
 
@@ -59,14 +61,21 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
                 ))
                 if(response.body()!!.token.isNotEmpty()){
                     _uiState.value=SignUpEvent.EventSuccess
+                    session.saveToken(response.body()!!.token)
                     _navigationEvent.emit(SignUpNavigationEvent.NavigateToHome)
                 }
                 else{
                     _uiState.value=SignUpEvent.EventError
+                    msg="Error"
+                    dis="hsakghkasjhvkaskjbkjas asdvvs"
+                    _uiState.emit(SignUpEvent.ShowErrorDialog)
                 }
             }catch (e:Exception){
                 e.printStackTrace()
                 _uiState.value=SignUpEvent.EventError
+                msg="Error"
+                dis=e.toString()
+                _uiState.emit(SignUpEvent.ShowErrorDialog)
             }
         }
     }
@@ -87,6 +96,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi): BaseAu
         object EventSuccess: SignUpEvent()
         object EventError: SignUpEvent()
         object EventNothing: SignUpEvent()
+        object ShowErrorDialog: SignUpEvent()
     }
 
     override fun loading() {

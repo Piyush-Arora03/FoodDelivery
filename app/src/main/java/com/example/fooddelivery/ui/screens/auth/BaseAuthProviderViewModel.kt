@@ -8,6 +8,7 @@ import androidx.credentials.CredentialManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.auth.GoogleUiProvider
 import com.example.fooddelivery.data.modle.OAuthRequest
 import com.example.fooddelivery.data.remote.ApiResponses
@@ -91,6 +92,7 @@ abstract class BaseAuthProviderViewModel(open val foodApi: FoodApi) : ViewModel(
             when (res) {
                 is ApiResponses.Success -> {
                     socialAuthSuccess(res.data.token)
+
                 }
                 else -> {
                     val error = (res as? ApiResponses.Error)?.code

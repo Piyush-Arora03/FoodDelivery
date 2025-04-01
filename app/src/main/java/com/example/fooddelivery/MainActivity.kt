@@ -31,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
@@ -38,6 +39,7 @@ import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +52,8 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var foodApi: FoodApi
+    @Inject
+    lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +89,8 @@ class MainActivity : ComponentActivity() {
             FoodDeliveryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController= rememberNavController()
-                    val navHost= NavHost(navController = navController, startDestination = AuthScreen, modifier = Modifier.padding(innerPadding),
+                    val navHost= NavHost(navController = navController, startDestination =
+                        if (session.getToken()!=null) HomeScreen else AuthScreen, modifier = Modifier.padding(innerPadding),
                         enterTransition = {
                            slideIntoContainer(
                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -117,8 +122,7 @@ class MainActivity : ComponentActivity() {
                             SignUpScreen(navController=navController)
                         }
                         composable<HomeScreen> {
-                            Box(modifier = Modifier.fillMaxSize().
-                            background(color = Color.White))
+                            HomeScreen(navController=navController)
                         }
                         composable<LogInScreen> {
                             SignInScreen(navController=navController)

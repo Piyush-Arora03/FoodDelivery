@@ -1,25 +1,9 @@
 package com.example.fooddelivery.ui.screens.auth
 
 import android.content.Context
-import android.os.Build
-import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
-import androidx.credentials.CredentialManager
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
-import com.example.fooddelivery.data.auth.GoogleUiProvider
-import com.example.fooddelivery.data.modle.OAuthRequest
-import com.example.fooddelivery.data.modle.SignInRequest
-import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
-import com.facebook.CallbackManager
-import com.facebook.CallbackManager.Factory.create
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.login.LoginManager
-import com.facebook.login.LoginResult
-import com.google.android.gms.auth.api.Auth
+import com.example.fooddelivery.data.FoodHubAuthSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +14,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(override val foodApi: FoodApi): BaseAuthProviderViewModel(foodApi = foodApi) {
+class AuthViewModel @Inject constructor(override val foodApi: FoodApi, private val session: FoodHubAuthSession): BaseAuthProviderViewModel(foodApi = foodApi) {
 
     private val _uiState= MutableStateFlow<AuthEvent>(AuthEvent.EventNothing)
     val uiState=_uiState.asStateFlow()
@@ -72,6 +56,7 @@ class AuthViewModel @Inject constructor(override val foodApi: FoodApi): BaseAuth
     override fun socialAuthSuccess(msg: String) {
         viewModelScope.launch {
             _uiState.value=AuthEvent.EventSuccess
+            session.saveToken(msg)
             _navigationEvent.emit(AuthNavigationEvent.NavigateToHome)
         }
     }
