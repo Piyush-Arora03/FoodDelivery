@@ -7,8 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.internal.Contexts
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -16,9 +18,17 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     fun provideRetrofitClient():Retrofit{
+        val client = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS) // Increase timeout
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+//        192.168.29.117
+//        10.0.0.2
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl("http://192.168.29.117:8080")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
             .build()
     }
     @Provides

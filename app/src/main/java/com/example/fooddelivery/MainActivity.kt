@@ -11,6 +11,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,16 +33,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
+import com.example.fooddelivery.data.modle.FoodItem
 import com.example.fooddelivery.navigation.AuthScreen
+import com.example.fooddelivery.navigation.FoodDetailScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
+import com.example.fooddelivery.navigation.RestaurantDetail
 import com.example.fooddelivery.navigation.SignUpScreen
+import com.example.fooddelivery.navigation.foodItemNavType
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -55,6 +66,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
+    @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,43 +101,55 @@ class MainActivity : ComponentActivity() {
             FoodDeliveryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController= rememberNavController()
-                    val navHost= NavHost(navController = navController, startDestination =
+                    SharedTransitionLayout{
+                        val navHost= NavHost(navController = navController, startDestination =
                         if (session.getToken()!=null) HomeScreen else AuthScreen, modifier = Modifier.padding(innerPadding),
-                        enterTransition = {
-                           slideIntoContainer(
-                               towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                               animationSpec = tween(700),
-                           )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(700),
-                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(700),
-                            )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(700),
-                            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
-                        }){
-                        composable<AuthScreen> {
-                            AuthScreen(navController)
-                        }
-                        composable<SignUpScreen> {
-                            SignUpScreen(navController=navController)
-                        }
-                        composable<HomeScreen> {
-                            HomeScreen(navController=navController)
-                        }
-                        composable<LogInScreen> {
-                            SignInScreen(navController=navController)
+                            enterTransition = {
+                                slideIntoContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                    animationSpec = tween(700),
+                                )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                    animationSpec = tween(700),
+                                )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                            },
+                            popEnterTransition = {
+                                slideIntoContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                    animationSpec = tween(700),
+                                )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                    animationSpec = tween(700),
+                                )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+                            }){
+                            composable<AuthScreen> {
+                                AuthScreen(navController)
+                            }
+                            composable<SignUpScreen> {
+                                SignUpScreen(navController=navController)
+                            }
+                            composable<HomeScreen> {
+                                HomeScreen(navController=navController, animatedVisibilityScope = this)
+                            }
+                            composable<LogInScreen> {
+                                SignInScreen(navController=navController)
+                            }
+                            composable<RestaurantDetail>{
+                                val route=it.toRoute<RestaurantDetail>()
+                                RestaurantDetailScreen(this,route.name,route.imageUrl,route.id,navController)
+                            }
+                            composable<FoodDetailScreen>(
+                                mapOf(typeOf<FoodItem>() to foodItemNavType)
+                            ) {
+                                val route=it.toRoute<FoodDetailScreen>()
+                                FoodDetail(route.foodItem,animatedVisibilityScope = this,navController)
+                            }
                         }
                     }
                 }
