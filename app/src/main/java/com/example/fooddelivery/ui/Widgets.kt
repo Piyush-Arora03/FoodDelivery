@@ -7,12 +7,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -224,5 +227,37 @@ fun BasicDialog(
             Text(text = "OK", modifier = Modifier.padding(4.dp))
         }
         Spacer(modifier = Modifier.padding(vertical = 8.dp))
+    }
+}
+
+
+@Composable
+fun <T> LazyColumnGrid(
+    items: List<T>,
+    columns: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable (T) -> Unit
+) {
+    LazyColumn(modifier = modifier) {
+        items(items.chunked(columns)) { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (item in rowItems) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
+                    ) {
+                        content(item)
+                    }
+                }
+                // Fill empty spaces in the last row if needed
+                repeat(columns - rowItems.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
     }
 }

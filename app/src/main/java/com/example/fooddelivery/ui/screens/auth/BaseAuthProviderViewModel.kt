@@ -2,6 +2,7 @@ package com.example.fooddelivery.ui.screens.auth
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.credentials.CredentialManager
@@ -95,6 +96,7 @@ abstract class BaseAuthProviderViewModel(open val foodApi: FoodApi) : ViewModel(
 
                 }
                 else -> {
+                    Log.d("TAGe","errorOccured")
                     val error = (res as? ApiResponses.Error)?.code
                     if (error != null) {
                         when (error) {

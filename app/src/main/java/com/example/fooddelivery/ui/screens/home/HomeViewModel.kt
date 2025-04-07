@@ -1,13 +1,12 @@
 package com.example.fooddelivery.ui.screens.home
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddelivery.data.FoodApi
-import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.modle.Category
+import com.example.fooddelivery.data.modle.Restaurant
+import com.example.fooddelivery.data.modle.RestaurantResponse
 import com.example.fooddelivery.data.remote.ApiResponses
 import com.example.fooddelivery.data.remote.SafeApiCalls
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,19 +26,25 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
 
     private val _navigationEvent= MutableSharedFlow<HomeScreenNavigationEvent>()
     val navigationEvent=_navigationEvent.asSharedFlow()
-
+    var categories= emptyList<Category>()
+    var restaurants= emptyList<Restaurant>()
     init {
-        getCategories()
-        getPopularRestaurants()
-    }
-    val categories= mutableListOf<Category>()
-    fun getCategories(){
         viewModelScope.launch {
+            categories=getCategories()
+            restaurants=getPopularRestaurants()
+            if(categories.isNotEmpty() && restaurants.isNotEmpty()){
+                _uiState.value=HomeScreenState.Success
+            }
+            else{
+                _uiState.value=HomeScreenState.Empty
+            }
+        }
+    }
+    suspend fun getCategories(): List<Category> {
             SafeApiCalls { foodApi.getCategories() }.let {
                 when(it){
                     is ApiResponses.Success->{
-                        _uiState.value=HomeScreenState.Success
-                        categories.addAll(it.data.data)
+                        categories=it.data.data
                         Log.d(TAG,categories.toString())
                     }
                     is ApiResponses.Error->{
@@ -50,12 +55,34 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
                     }
                 }
             }
-        }
+        return categories
     }
 
 
-    fun getPopularRestaurants(){
+    suspend fun getPopularRestaurants():List<Restaurant>{
+        SafeApiCalls {
+            foodApi.getRestaurants(40.7128,-74.0060)
+        }.let {
+            when(it){
+                is ApiResponses.Success->{
+                    restaurants=it.data.data
+                    Log.d(TAG,restaurants.toString())
+                }
+                is ApiResponses.Error->{
+                    _uiState.value=HomeScreenState.Error
+                }
+                else->{
+                    _uiState.value=HomeScreenState.Empty
+                }
+            }
+        }
+        return restaurants
+    }
 
+    fun navigateToDetails(it: Restaurant) {
+        viewModelScope.launch {
+            _navigationEvent.emit(HomeScreenNavigationEvent.NavigateToDetail(it.id,it.name,it.imageUrl))
+        }
     }
 
     sealed class HomeScreenState{
@@ -66,6 +93,6 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
     }
 
     sealed class HomeScreenNavigationEvent{
-        object NavigateToDetail:HomeScreenNavigationEvent()
+        data class NavigateToDetail(val id:String,val name:String,val imageUrl:String):HomeScreenNavigationEvent()
     }
 }
