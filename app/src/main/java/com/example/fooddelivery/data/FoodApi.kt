@@ -1,5 +1,7 @@
 package com.example.fooddelivery.data
 
+import com.example.fooddelivery.data.modle.AddToCartRequest
+import com.example.fooddelivery.data.modle.AddToCartResponse
 import com.example.fooddelivery.data.modle.AuthResponse
 import com.example.fooddelivery.data.modle.CategoriesResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
@@ -40,4 +42,7 @@ interface FoodApi {
 
     @GET("/restaurants/{id}/menu")
     suspend fun getFootItem(@Path ("id") id:String):Response<FoodItemResponse>
+
+    @POST("/cart")
+    suspend fun addToCart(@Body request: AddToCartRequest):Response<AddToCartResponse>
 }

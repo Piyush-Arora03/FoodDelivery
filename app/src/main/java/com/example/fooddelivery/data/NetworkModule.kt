@@ -17,16 +17,22 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideRetrofitClient():Retrofit{
+    fun provideRetrofitClient(session: FoodHubAuthSession):Retrofit{
         val client = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS) // Increase timeout
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor {chain->
+                val request=chain.request().newBuilder()
+                    .addHeader("Authorization","Bearer ${session.getToken()}")
+                    .build()
+                chain.proceed(request)
+            }
             .build()
 //        192.168.29.117
-//        10.0.0.2
+//        10.0.2.2
         return Retrofit.Builder()
-            .baseUrl("http://192.168.29.117:8080")
+            .baseUrl("http://10.0.2.2:8080")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

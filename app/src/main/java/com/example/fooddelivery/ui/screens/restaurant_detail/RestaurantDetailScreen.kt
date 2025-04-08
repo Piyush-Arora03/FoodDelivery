@@ -77,7 +77,6 @@ fun SharedTransitionScope.RestaurantDetailScreen(
         viewModel.getFoodItem(restaurantId)
     }
     LazyColumn {
-        val foodItems = (uiState.value as RestaurantViewModel.RestaurantUiState.Success).data
         // ✅ Single Column Header
         item {
             RestaurantHeader(
@@ -97,6 +96,7 @@ fun SharedTransitionScope.RestaurantDetailScreen(
 
         when (uiState.value) {
             is RestaurantViewModel.RestaurantUiState.Success -> {
+                val foodItems = (uiState.value as RestaurantViewModel.RestaurantUiState.Success).data
                 items(foodItems.chunked(2)) { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
