@@ -60,7 +60,8 @@ fun SharedTransitionScope.FoodDetail(
     foodItem: FoodItem,
     animatedVisibilityScope: AnimatedVisibilityScope,
     navController: NavController,
-    viewModel: FoodDetailViewModel= hiltViewModel()
+    viewModel: FoodDetailViewModel= hiltViewModel(),
+    onItemAddedToCart:()->Unit
 ) {
     val count= viewModel.quantity.collectAsStateWithLifecycle()
     val uiState=viewModel.uiState.collectAsStateWithLifecycle()
@@ -81,6 +82,7 @@ fun SharedTransitionScope.FoodDetail(
     }
     when(uiState.value){
         is FoodDetailViewModel.FoodDetailUiState.Success->{
+            onItemAddedToCart()
             showSuccessDialog.value=true
             isLoading.value=false
             showErrorDialog.value=false

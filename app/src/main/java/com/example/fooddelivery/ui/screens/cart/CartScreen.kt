@@ -57,14 +57,12 @@ import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartScreen(navController: NavController,viewModel: CartViewModel= hiltViewModel()) {
+fun CartScreen(navController: NavController,viewModel: CartViewModel) {
     val uiState=viewModel.uiState.collectAsState()
     var showErrorDialog= remember {
         mutableStateOf(false)
     }
-    var isCartEmpty= remember {
-        mutableStateOf(false)
-    }
+
     LaunchedEffect(Unit) {
         val navigationEvent=viewModel.navigationEvent.collectLatest {
             when(it){

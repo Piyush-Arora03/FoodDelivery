@@ -11,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
@@ -22,15 +23,36 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.navigation.toRoute
@@ -42,6 +64,7 @@ import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.navigation.FoodDetailScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
+import com.example.fooddelivery.navigation.NavRoutes
 import com.example.fooddelivery.navigation.NotificationScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.navigation.SignUpScreen
@@ -50,10 +73,14 @@ import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.screens.cart.CartScreen
+import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.ui.theme.Mustard
+import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,10 +97,10 @@ class MainActivity : ComponentActivity() {
     lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
 
-    sealed class BottomNavItems(val route:Any,val icon:Int){
-        object Home:BottomNavItems(HomeScreen,R.drawable.ic_google)
-        object Cart:BottomNavItems(CartScreen,R.drawable.ic_google)
-        object Notification:BottomNavItems(NotificationScreen,R.drawable.ic_google)
+    sealed class BottomNavItems(val route:NavRoutes,val icon:Int){
+        object Home:BottomNavItems(HomeScreen,R.drawable.nav_home)
+        object Cart:BottomNavItems(CartScreen,R.drawable.nav_cart)
+        object Notification:BottomNavItems(NotificationScreen,R.drawable.nav_notification)
     }
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -108,8 +135,55 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             FoodDeliveryTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController= rememberNavController()
+                var showBottomNavSheet= remember {
+                    mutableStateOf(false)
+                }
+                val bottomNavItems= listOf(
+                    BottomNavItems.Home,
+                    BottomNavItems.Cart,
+                    BottomNavItems.Notification)
+                val navController= rememberNavController()
+                val cartViewModel:CartViewModel=hiltViewModel()
+                Scaffold(modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        val currRoute=navController.currentBackStackEntryAsState().value?.destination
+                        AnimatedVisibility(visible = showBottomNavSheet.value) {
+                            NavigationBar(
+                                containerColor = Color.White
+                            ) {
+                                bottomNavItems.forEach {item->
+                                    val selected=currRoute?.hierarchy?.any { it.route==item.route::class.qualifiedName }==true
+                                    val count=cartViewModel.cartItemCount.collectAsStateWithLifecycle().value
+                                    NavigationBarItem(
+                                        selected = false,
+                                        onClick = {  navController.navigate(item.route)},
+                                        icon = {
+                                            Box(modifier = Modifier.size(48.dp)) {
+                                                if(item.route==BottomNavItems.Cart.route && count>0)Box(
+                                                    modifier = Modifier
+                                                        .size(18.dp)
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(Mustard)
+                                                        .align(Alignment.TopEnd)
+                                                    , contentAlignment = Alignment.Center
+                                                ){
+                                                    Text(text=count.toString(), color = Color.White, style = TextStyle(
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        fontFamily = poppinsFontFamily
+                                                    ))
+                                                }
+                                                Icon(painter = painterResource(item.icon),
+                                                    contentDescription = null,
+                                                    tint = if(selected) Orange else Color.Gray,
+                                                    modifier = Modifier.align(Alignment.Center))
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }) { innerPadding ->
                     SharedTransitionLayout{
                         val navHost= NavHost(navController = navController, startDestination =
                         if (session.getToken()!=null) HomeScreen else AuthScreen, modifier = Modifier.padding(innerPadding),
@@ -138,29 +212,44 @@ class MainActivity : ComponentActivity() {
                                 )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
                             }){
                             composable<AuthScreen> {
+                                showBottomNavSheet.value=false
                                 AuthScreen(navController)
                             }
                             composable<SignUpScreen> {
+                                showBottomNavSheet.value=false
                                 SignUpScreen(navController=navController)
                             }
                             composable<HomeScreen> {
+                                showBottomNavSheet.value=true
                                 HomeScreen(navController=navController, animatedVisibilityScope = this)
                             }
                             composable<LogInScreen> {
+                                showBottomNavSheet.value=false
                                 SignInScreen(navController=navController)
                             }
                             composable<RestaurantDetailScreen>{
+                                showBottomNavSheet.value=false
                                 val route=it.toRoute<RestaurantDetailScreen>()
                                 RestaurantDetailScreen(this,route.name,route.imageUrl,route.id,navController)
                             }
                             composable<FoodDetailScreen>(
                                 mapOf(typeOf<FoodItem>() to foodItemNavType)
                             ) {
+                                showBottomNavSheet.value=false
                                 val route=it.toRoute<FoodDetailScreen>()
-                                FoodDetail(route.foodItem,animatedVisibilityScope = this,navController)
+                                FoodDetail(route.foodItem,animatedVisibilityScope = this,navController){
+                                    cartViewModel.getCart()
+                                }
                             }
                             composable<CartScreen> {
-                                CartScreen(navController)
+                                showBottomNavSheet.value=true
+                                CartScreen(navController,cartViewModel)
+                            }
+                            composable<NotificationScreen> {
+                                showBottomNavSheet.value=true
+                                Box(){
+
+                                }
                             }
                         }
                     }

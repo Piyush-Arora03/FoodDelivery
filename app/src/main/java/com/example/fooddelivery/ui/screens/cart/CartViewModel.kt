@@ -25,6 +25,8 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
     val navigationEvent = _navigationEvent.asSharedFlow()
     var errMsg=""
     var errDes=""
+    private val _cartItemCount= MutableStateFlow(0)
+    val cartItemCount=_cartItemCount.asStateFlow()
     init {
         getCart()
     }
@@ -37,6 +39,7 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
             when(response){
                 is ApiResponses.Success->{
                     cartResponse=response.data
+                    _cartItemCount.value=response.data.items.size
                     _uiState.value=CartUiState.Success(response.data)
                 }
                 is ApiResponses.Error->{
