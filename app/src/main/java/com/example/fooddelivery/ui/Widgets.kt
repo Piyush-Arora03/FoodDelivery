@@ -189,6 +189,7 @@ fun BasicDialog(
 ) {
     Column(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(20.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White.copy(alpha = 0.4f)),
@@ -227,37 +228,5 @@ fun BasicDialog(
             Text(text = "OK", modifier = Modifier.padding(4.dp))
         }
         Spacer(modifier = Modifier.padding(vertical = 8.dp))
-    }
-}
-
-
-@Composable
-fun <T> LazyColumnGrid(
-    items: List<T>,
-    columns: Int,
-    modifier: Modifier = Modifier,
-    content: @Composable (T) -> Unit
-) {
-    LazyColumn(modifier = modifier) {
-        items(items.chunked(columns)) { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                for (item in rowItems) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(4.dp)
-                    ) {
-                        content(item)
-                    }
-                }
-                // Fill empty spaces in the last row if needed
-                repeat(columns - rowItems.size) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
     }
 }

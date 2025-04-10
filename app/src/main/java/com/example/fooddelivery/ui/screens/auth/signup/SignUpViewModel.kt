@@ -56,18 +56,17 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi,private 
         viewModelScope.launch {
             _uiState.value=SignUpEvent.EventLoading
             try {
-                val response=foodApi.signUpRequest(SignUpRequest(
-                    name.value,email.value,password.value
-                ))
-                if(response.body()!!.token.isNotEmpty()){
-                    _uiState.value=SignUpEvent.EventSuccess
-                    session.saveToken(response.body()!!.token)
+                val response = foodApi.signUpRequest(SignUpRequest(name.value, email.value, password.value))
+                val body = response.body()
+
+                if (response.isSuccessful && body != null && body.token.isNotEmpty()) {
+                    _uiState.value = SignUpEvent.EventSuccess
+                    session.saveToken(body.token)
                     _navigationEvent.emit(SignUpNavigationEvent.NavigateToHome)
-                }
-                else{
-                    _uiState.value=SignUpEvent.EventError
-                    msg="Error"
-                    dis="hsakghkasjhvkaskjbkjas asdvvs"
+                } else {
+                    _uiState.value = SignUpEvent.EventError
+                    msg = "Error"
+                    dis = response.errorBody()?.string() ?: "Signup failed"
                     _uiState.emit(SignUpEvent.ShowErrorDialog)
                 }
             }catch (e:Exception){

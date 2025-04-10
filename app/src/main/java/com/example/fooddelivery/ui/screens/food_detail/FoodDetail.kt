@@ -24,6 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -32,7 +34,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
@@ -44,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.FoodItem
+import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.restaurant_detail.HeaderDetails
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantHeader
@@ -108,15 +113,8 @@ fun SharedTransitionScope.FoodDetail(
             Text(text = "$"+foodItem.price.toString(), modifier = Modifier.sharedElement(state = rememberSharedContentState("price/${foodItem.id}"),animatedVisibilityScope).padding(start = 10.dp), color = Orange,
                 style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
             )
-            Spacer(modifier = Modifier.padding(horizontal = 30.dp))
-            Image(painter = painterResource(R.drawable.plus), contentDescription = null, modifier = Modifier.size(80.dp).clickable {
-                viewModel.incrementQuantity()
-            }.clip(CircleShape))
-            Text(text = count.value.toString(), modifier = Modifier, color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Start)
-            Image(painter = painterResource(R.drawable.minus), contentDescription = null, modifier = Modifier.size(100.dp).clickable {
-                viewModel.decrementQuantity()
-            }.clip(CircleShape))
+            Spacer(modifier = Modifier.weight(1f))
+            ItemCounter(onCounterIncrement = {viewModel.incrementQuantity()}, onCounterDecrement = {viewModel.decrementQuantity()},count.value)
         }
         Spacer(modifier = Modifier.weight(1f))
         Button(
@@ -178,11 +176,63 @@ fun SharedTransitionScope.FoodDetail(
                 Spacer(modifier = Modifier.padding(2.dp))
                 Button(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), onClick = {
                     viewModel.resetUi()
+                    navController.navigate(CartScreen)
                 },colors = ButtonDefaults.buttonColors(Orange)) {
                     Text(text = "GO TO CART")
                 }
                 Spacer(modifier = Modifier.padding(2.dp))
             }
         }
+    }
+}
+
+@Composable
+fun ItemCounter(
+    onCounterIncrement: () -> Unit,
+    onCounterDecrement: () -> Unit,
+    count: Int
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(Orange.copy(alpha = 0.1f))
+                .clickable { onCounterIncrement.invoke() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.plus),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp).alpha(1.3f)
+                    .shadow(6.dp, spotColor = Orange.copy(0.1f), ambientColor = Orange.copy(0.1f))
+            )
+        }
+
+
+        Text(
+            text = count.toString(),
+            modifier = Modifier.padding(horizontal = 8.dp),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(Orange.copy(alpha = 0.1f))
+                .clickable { onCounterDecrement.invoke() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.minus),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp).alpha(1.3f)
+                    .shadow(6.dp, spotColor = Orange.copy(0.1f), ambientColor = Orange.copy(0.1f))
+            )
+        }
+
     }
 }

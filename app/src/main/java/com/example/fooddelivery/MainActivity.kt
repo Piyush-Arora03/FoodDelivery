@@ -38,15 +38,18 @@ import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.modle.FoodItem
 import com.example.fooddelivery.navigation.AuthScreen
+import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.navigation.FoodDetailScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
-import com.example.fooddelivery.navigation.RestaurantDetail
+import com.example.fooddelivery.navigation.NotificationScreen
+import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.navigation.foodItemNavType
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
@@ -66,6 +69,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
+
+    sealed class BottomNavItems(val route:Any,val icon:Int){
+        object Home:BottomNavItems(HomeScreen,R.drawable.ic_google)
+        object Cart:BottomNavItems(CartScreen,R.drawable.ic_google)
+        object Notification:BottomNavItems(NotificationScreen,R.drawable.ic_google)
+    }
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,8 +149,8 @@ class MainActivity : ComponentActivity() {
                             composable<LogInScreen> {
                                 SignInScreen(navController=navController)
                             }
-                            composable<RestaurantDetail>{
-                                val route=it.toRoute<RestaurantDetail>()
+                            composable<RestaurantDetailScreen>{
+                                val route=it.toRoute<RestaurantDetailScreen>()
                                 RestaurantDetailScreen(this,route.name,route.imageUrl,route.id,navController)
                             }
                             composable<FoodDetailScreen>(
@@ -149,6 +158,9 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 val route=it.toRoute<FoodDetailScreen>()
                                 FoodDetail(route.foodItem,animatedVisibilityScope = this,navController)
+                            }
+                            composable<CartScreen> {
+                                CartScreen(navController)
                             }
                         }
                     }
