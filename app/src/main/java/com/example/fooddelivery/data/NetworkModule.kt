@@ -3,6 +3,9 @@ package com.example.fooddelivery.data
 import android.content.Context
 import android.util.Log
 import androidx.credentials.CredentialOption
+import com.example.fooddelivery.location.LocationManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +41,7 @@ object NetworkModule {
 //        192.168.29.117
 //        10.0.2.2
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl("http://192.168.29.117:8080")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -52,5 +55,10 @@ object NetworkModule {
     @Singleton
     fun foodHubAuthSession(@ApplicationContext context: Context) : FoodHubAuthSession{
         return FoodHubAuthSession(context =context)
+    }
+
+    @Provides
+    fun getLocation(@ApplicationContext context: Context) : FusedLocationProviderClient{
+        return LocationServices.getFusedLocationProviderClient(context)
     }
 }

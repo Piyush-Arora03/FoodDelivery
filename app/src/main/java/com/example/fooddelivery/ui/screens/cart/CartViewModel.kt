@@ -109,12 +109,17 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
     fun resetUi(){
         _uiState.value=CartUiState.Nothing
     }
-
+    fun onAddressClicked(){
+        viewModelScope.launch {
+            _navigationEvent.emit(CartEvent.onAddressClicked)
+        }
+    }
     sealed class CartEvent(){
         object ShowErrorDialog : CartEvent()
         object OnCheckOut : CartEvent()
         object OnQuantityUpdateError:CartEvent()
         object OnRemoveError:CartEvent()
+        object onAddressClicked: CartEvent()
     }
 
     sealed class CartUiState(){

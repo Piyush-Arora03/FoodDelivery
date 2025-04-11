@@ -59,6 +59,8 @@ import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.data.modle.FoodItem
+import com.example.fooddelivery.navigation.AddAddressScreen
+import com.example.fooddelivery.navigation.AddressListScreen
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.navigation.FoodDetailScreen
@@ -69,6 +71,8 @@ import com.example.fooddelivery.navigation.NotificationScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.navigation.foodItemNavType
+import com.example.fooddelivery.ui.screens.add_address.AddAddress
+import com.example.fooddelivery.ui.screens.address_list.AddressList
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
@@ -250,6 +254,14 @@ class MainActivity : ComponentActivity() {
                                 Box(){
 
                                 }
+                            }
+                            composable<AddressListScreen> {
+                                showBottomNavSheet.value=false
+                                AddressList(navController = navController)
+                            }
+                            composable<AddAddressScreen> {
+                                showBottomNavSheet.value=false
+                                AddAddress(navController = navController)
                             }
                         }
                     }

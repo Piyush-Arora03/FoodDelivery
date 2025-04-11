@@ -27,3 +27,9 @@ object CartScreen: NavRoutes
 
 @Serializable
 object NotificationScreen: NavRoutes
+
+@Serializable
+object AddressListScreen:NavRoutes
+
+@Serializable
+object AddAddressScreen:NavRoutes

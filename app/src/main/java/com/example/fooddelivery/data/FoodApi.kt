@@ -2,6 +2,7 @@ package com.example.fooddelivery.data
 
 import com.example.fooddelivery.data.modle.AddToCartRequest
 import com.example.fooddelivery.data.modle.AddToCartResponse
+import com.example.fooddelivery.data.modle.AddressListResponse
 import com.example.fooddelivery.data.modle.AuthResponse
 import com.example.fooddelivery.data.modle.CartResponse
 import com.example.fooddelivery.data.modle.CategoriesResponse
@@ -59,4 +60,7 @@ interface FoodApi {
 
     @DELETE("/cart/{cartItemId}")
     suspend fun removeItem(@Path ("cartItemId") id:String):Response<GenericMsgResponse>
+
+    @GET("/addresses")
+    suspend fun getAddresses():Response<AddressListResponse>
 }
