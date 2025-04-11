@@ -100,15 +100,19 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
     implementation(libs.androidx.compose.foundation)
-    implementation("androidx.compose.animation:animation:1.7.8")
-    implementation("androidx.compose.animation:animation-graphics:1.7.8")
+    implementation(libs.androidx.animation.v178)
+    implementation(libs.androidx.animation.graphics)
 
     // This is the important one
-    implementation("androidx.compose.animation:animation-core:1.7.8")
+    implementation(libs.androidx.animation.core)
 
     // For shared transitions (experimental)
-    implementation("androidx.compose.animation:animation:1.6.0-beta01")
+    implementation(libs.androidx.animation.v160beta01)
     implementation(libs.androidx.compose.animation)
+    //maps
+    implementation(libs.maps.compose)
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 }
 
 kapt {

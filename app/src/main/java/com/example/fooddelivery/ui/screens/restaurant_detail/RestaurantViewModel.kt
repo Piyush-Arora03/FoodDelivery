@@ -64,6 +64,9 @@ class RestaurantViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(
             }
         }
     }
+    fun resetUi(){
+        _uiState.value=RestaurantUiState.Nothing
+    }
     sealed class RestaurantNavigationEvent{
         object GoBack:RestaurantNavigationEvent()
         data class ToProductDetail(val productId:String):RestaurantNavigationEvent()

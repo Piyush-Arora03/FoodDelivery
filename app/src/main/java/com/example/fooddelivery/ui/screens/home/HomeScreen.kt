@@ -47,7 +47,7 @@ import coil.compose.AsyncImage
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Category
 import com.example.fooddelivery.data.modle.Restaurant
-import com.example.fooddelivery.navigation.RestaurantDetail
+import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
@@ -64,7 +64,7 @@ fun SharedTransitionScope.HomeScreen(navController: NavController,viewModel: Hom
             viewModel.navigationEvent.collectLatest {
                 when(it){
                     is HomeViewModel.HomeScreenNavigationEvent.NavigateToDetail->{
-                        navController.navigate(RestaurantDetail(it.name,it.imageUrl,it.id))
+                        navController.navigate(RestaurantDetailScreen(it.name,it.imageUrl,it.id))
                     }
                 }
             }

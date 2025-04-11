@@ -3,20 +3,33 @@ package com.example.fooddelivery.navigation
 import com.example.fooddelivery.data.modle.FoodItem
 import kotlinx.serialization.Serializable
 
+interface NavRoutes
 @Serializable
-object SignUpScreen
+object SignUpScreen: NavRoutes
 
 @Serializable
-object LogInScreen
+object LogInScreen: NavRoutes
 
 @Serializable
-object AuthScreen
+object AuthScreen: NavRoutes
 
 @Serializable
-object HomeScreen
+object HomeScreen: NavRoutes
 
 @Serializable
-data class RestaurantDetail(val name:String,val imageUrl:String,val id: String)
+data class RestaurantDetailScreen(val name:String,val imageUrl:String,val id: String): NavRoutes
 
 @Serializable
-data class FoodDetailScreen(val foodItem:FoodItem)
+data class FoodDetailScreen(val foodItem:FoodItem): NavRoutes
+
+@Serializable
+object CartScreen: NavRoutes
+
+@Serializable
+object NotificationScreen: NavRoutes
+
+@Serializable
+object AddressListScreen:NavRoutes
+
+@Serializable
+object AddAddressScreen:NavRoutes
