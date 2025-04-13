@@ -1,5 +1,9 @@
 package com.example.fooddelivery.data.modle
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Address(
     val id: String? = null,
     val userId: String? = null,
@@ -11,4 +15,4 @@ data class Address(
     val country: String,
     val latitude: Double? = null,
     val longitude: Double? = null
-)
+) : Parcelable

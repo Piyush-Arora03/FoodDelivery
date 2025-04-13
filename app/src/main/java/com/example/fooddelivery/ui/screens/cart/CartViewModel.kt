@@ -3,6 +3,7 @@ package com.example.fooddelivery.ui.screens.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
+import com.example.fooddelivery.data.modle.Address
 import com.example.fooddelivery.data.modle.CartItem
 import com.example.fooddelivery.data.modle.CartResponse
 import com.example.fooddelivery.data.modle.UpdateCartItemRequest
@@ -27,6 +28,8 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
     var errDes=""
     private val _cartItemCount= MutableStateFlow(0)
     val cartItemCount=_cartItemCount.asStateFlow()
+    private val _address= MutableStateFlow<Address?>(null)
+    val address=_address.asStateFlow()
     init {
         getCart()
     }
@@ -114,6 +117,11 @@ class CartViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
             _navigationEvent.emit(CartEvent.onAddressClicked)
         }
     }
+
+    fun onAddressSelected(value: Address) {
+        _address.value=value
+    }
+
     sealed class CartEvent(){
         object ShowErrorDialog : CartEvent()
         object OnCheckOut : CartEvent()

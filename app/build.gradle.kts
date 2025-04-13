@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -111,8 +112,11 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     //maps
     implementation(libs.maps.compose)
-    implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation(libs.play.services.location)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    //stripe
+    implementation(libs.stripe.android)
 }
 
 kapt {

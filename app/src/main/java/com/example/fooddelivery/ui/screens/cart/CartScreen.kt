@@ -44,6 +44,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -64,10 +65,16 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun CartScreen(navController: NavController,viewModel: CartViewModel) {
     val uiState=viewModel.uiState.collectAsState()
-    var showErrorDialog= remember {
+    val showErrorDialog= remember {
         mutableStateOf(false)
     }
-
+    val address=navController.currentBackStackEntry?.savedStateHandle?.getStateFlow<Address?>("address",null)
+        ?.collectAsStateWithLifecycle(null)
+    LaunchedEffect(address?.value) {
+        address?.value?.let{
+            viewModel.onAddressSelected(it)
+        }
+    }
     LaunchedEffect(Unit) {
         val navigationEvent=viewModel.navigationEvent.collectLatest {
             when(it){
@@ -85,8 +92,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
     }
     Column(modifier = Modifier.fillMaxSize()) {
         CartHeaderView { navController.popBackStack() }
-        when (uiState.value) {
-            is CartViewModel.CartUiState.Success -> {
+        when (uiState.value) {is CartViewModel.CartUiState.Success -> {
                 val data = (uiState.value as CartViewModel.CartUiState.Success).cartResponse
                 LazyColumn(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
                     items(data.items) {
@@ -102,12 +108,13 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                              }
                         }
                         else{
+                            val selectedAddress=viewModel.address.collectAsStateWithLifecycle()
                             Spacer(modifier = Modifier.padding(10.dp))
                             CheckoutDetailView(data.checkoutDetails)
                             Spacer(modifier = Modifier.padding(8.dp))
-                            AddressCard(address = null, onAddressClicked = { viewModel.onAddressClicked() })
+                            AddressCard(address = selectedAddress.value, onAddressClicked = { viewModel.onAddressClicked() })
                             Spacer(modifier = Modifier.padding(8.dp))
-                            Button(onClick = {}, colors = ButtonDefaults.buttonColors(Orange)) {
+                            Button(onClick = {}, colors = ButtonDefaults.buttonColors(Orange), enabled = selectedAddress.value!=null) {
                                 Text(text = "CHECKOUT", fontSize = 16.sp, modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp), fontFamily = poppinsFontFamily)
                             }
                         }

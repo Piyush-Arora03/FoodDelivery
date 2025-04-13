@@ -20,6 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,10 +33,33 @@ import com.example.fooddelivery.R
 import com.example.fooddelivery.navigation.AddAddressScreen
 import com.example.fooddelivery.ui.screens.cart.AddressCard
 import com.example.fooddelivery.ui.theme.Orange
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddressList(navController: NavController,viewModel: AddressListViewModel= hiltViewModel()) {
     val state=viewModel.uiState.collectAsStateWithLifecycle()
+    val isAddressAdded=navController.currentBackStackEntry?.savedStateHandle?.getStateFlow("isAddressAdded",false)
+        ?.collectAsState(false)
+    LaunchedEffect(isAddressAdded?.value) {
+        if(isAddressAdded?.value==true){
+            viewModel.getAddress()
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collectLatest {
+            when(val navigationEvent=it){
+                is AddressListViewModel.AddressListEvent.NavigateToAddAddress->{
+                    //navController.navigate(AddAddressScreen)
+                }
+                is AddressListViewModel.AddressListEvent.NavigateToEditAddress -> TODO()
+                is AddressListViewModel.AddressListEvent.NavigateBack -> {
+                    val address=navigationEvent.address
+                    navController.previousBackStackEntry?.savedStateHandle?.set("address",address)
+                    navController.popBackStack()
+                }
+            }
+        }
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         AddressListScreenHeader(onBackClick = {navController.popBackStack()}, onAddClick = {navController.navigate(AddAddressScreen)})
         when(state.value){
@@ -42,11 +67,10 @@ fun AddressList(navController: NavController,viewModel: AddressListViewModel= hi
                 val data=(state.value as AddressListViewModel.AddressListUiState.Success).data
                 LazyColumn {
                     items(data.size){
-                        AddressCard(data[it], onAddressClicked = {})
+                        AddressCard(data[it], onAddressClicked = {viewModel.onAddressClicked(data[it])})
                     }
                 }
             }
-
             is AddressListViewModel.AddressListUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                     Button(onClick = {
