@@ -72,14 +72,7 @@ fun AddressList(navController: NavController,viewModel: AddressListViewModel= hi
                 }
             }
             is AddressListViewModel.AddressListUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Button(onClick = {
-                        viewModel.getAddress()
-                    },
-                        colors = ButtonDefaults.buttonColors(Orange)) {
-                        Text(text = "Retry",style=MaterialTheme.typography.titleLarge)
-                    }
-                }
+                OnUiStateError(onClick = {viewModel.getAddress()},text ="Retry")
             }
             is AddressListViewModel.AddressListUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
@@ -105,6 +98,18 @@ fun AddressListScreenHeader(onBackClick:()->Unit,onAddClick:()->Unit){
         Text(text = "Address", modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.titleLarge)
         IconButton(onClick = {onAddClick.invoke()}, modifier = Modifier.align(Alignment.TopEnd)){
             Image(painter = painterResource(R.drawable.baseline_add_24), contentDescription = null, modifier = Modifier.size(40.dp))
+        }
+    }
+}
+
+@Composable
+fun OnUiStateError(onClick:()->Unit,text:String){
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        Button(onClick = {
+            onClick.invoke()
+        },
+            colors = ButtonDefaults.buttonColors(Orange)) {
+            Text(text = text,style=MaterialTheme.typography.titleLarge)
         }
     }
 }

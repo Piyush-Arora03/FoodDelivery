@@ -53,13 +53,19 @@ import com.example.fooddelivery.data.modle.Address
 import com.example.fooddelivery.data.modle.CartItem
 import com.example.fooddelivery.data.modle.CheckoutDetails
 import com.example.fooddelivery.navigation.AddressListScreen
+import com.example.fooddelivery.navigation.OrderSuccessScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetailViewModel
 import com.example.fooddelivery.ui.screens.food_detail.ItemCounter
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import com.example.fooddelivery.utils.StringUtils
+import com.stripe.android.PaymentConfiguration
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
+import com.stripe.android.paymentsheet.rememberPaymentSheet
 import kotlinx.coroutines.flow.collectLatest
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +81,13 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
             viewModel.onAddressSelected(it)
         }
     }
+    val paymentSheet=rememberPaymentSheet(paymentResultCallback = {
+        if(it is PaymentSheetResult.Completed){
+            viewModel.onPaymentSuccess()
+        }else{
+            viewModel.onPaymentFailed()
+        }
+    })
     LaunchedEffect(Unit) {
         val navigationEvent=viewModel.navigationEvent.collectLatest {
             when(it){
@@ -84,8 +97,25 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                 CartViewModel.CartEvent.ShowErrorDialog -> {
                     showErrorDialog.value=true
                 }
-                CartViewModel.CartEvent.onAddressClicked->{
+                CartViewModel.CartEvent.OnAddressClicked->{
                     navController.navigate(AddressListScreen)
+                }
+                is CartViewModel.CartEvent.OnPaymentInitiated -> {
+                    PaymentConfiguration.init(navController.context,it.data.publishableKey)
+                    val customer=PaymentSheet.CustomerConfiguration(it.data.customerId,
+                    it.data.ephemeralKeySecret)
+                    val paymentSHeetConfiguration=PaymentSheet.Configuration(
+                        merchantDisplayName = "Food Hub",
+                        customer = customer,
+                        allowsDelayedPaymentMethods = false
+                    )
+                    paymentSheet.presentWithPaymentIntent(
+                        it.data.paymentIntentClientSecret,
+                        paymentSHeetConfiguration)
+                }
+                is CartViewModel.CartEvent.OnPaymentSuccess -> {
+                    viewModel.getCart()
+                    navController.navigate(OrderSuccessScreen(it.orderId?:""))
                 }
             }
         }
@@ -114,7 +144,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                             Spacer(modifier = Modifier.padding(8.dp))
                             AddressCard(address = selectedAddress.value, onAddressClicked = { viewModel.onAddressClicked() })
                             Spacer(modifier = Modifier.padding(8.dp))
-                            Button(onClick = {}, colors = ButtonDefaults.buttonColors(Orange), enabled = selectedAddress.value!=null) {
+                            Button(onClick = {viewModel.checkout()}, colors = ButtonDefaults.buttonColors(Orange), enabled = selectedAddress.value!=null) {
                                 Text(text = "CHECKOUT", fontSize = 16.sp, modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp), fontFamily = poppinsFontFamily)
                             }
                         }
@@ -128,7 +158,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = errMsg, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleLarge)
-                    Button(onClick = {},Modifier
+                    Button(onClick = {viewModel.getCart()},Modifier
                         .clip(RoundedCornerShape(16.dp))
                         , colors = ButtonDefaults.buttonColors(Orange)) {
                         Text(text="RETRY", modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleMedium)
@@ -141,7 +171,9 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                     CircularProgressIndicator()
                 }
             }
-            CartViewModel.CartUiState.Nothing -> TODO()
+            is CartViewModel.CartUiState.Nothing -> {
+                showErrorDialog.value=false
+            }
         }
     }
     if(showErrorDialog.value){
@@ -167,8 +199,8 @@ fun CartHeaderView(onBack:()->Unit){
 }
 @Composable
 fun CheckoutDetailView(checkoutDetails: CheckoutDetails){
-    Column(modifier = Modifier.
-        fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(10.dp), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
         Column(Modifier.fillMaxWidth()) {
             CheckoutItemView("SubTotal",checkoutDetails.subTotal,"USD")

@@ -7,9 +7,14 @@ import com.example.fooddelivery.data.modle.AddressListResponse
 import com.example.fooddelivery.data.modle.AuthResponse
 import com.example.fooddelivery.data.modle.CartResponse
 import com.example.fooddelivery.data.modle.CategoriesResponse
+import com.example.fooddelivery.data.modle.ConfirmPaymentRequest
+import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
 import com.example.fooddelivery.data.modle.OAuthRequest
+import com.example.fooddelivery.data.modle.OrderListResponse
+import com.example.fooddelivery.data.modle.PaymentIntentRequest
+import com.example.fooddelivery.data.modle.PaymentIntentResponse
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.data.modle.RestaurantResponse
 import com.example.fooddelivery.data.modle.ReverseGeocodeRequest
@@ -71,4 +76,13 @@ interface FoodApi {
 
     @POST("/addresses")
     suspend fun addAddress(@Body request: Address): Response<GenericMsgResponse>
+
+    @POST("/payments/create-intent")
+    suspend fun createPaymentIntent(@Body request: PaymentIntentRequest):Response<PaymentIntentResponse>
+
+    @POST("/payments/confirm/{paymentIntentId}")
+    suspend fun verifyPurchase(@Body request:ConfirmPaymentRequest,@Path("paymentIntentId") paymentIntentId:String): Response<ConfirmPaymentResponse>
+
+    @GET("/orders")
+    suspend fun getOrders():Response<OrderListResponse>
 }

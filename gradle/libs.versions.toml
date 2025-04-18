@@ -33,7 +33,7 @@ lifecycleRuntimeComposeAndroid = "2.8.7"
 googleid = "1.1.1"
 animationCompose="1.7.6"
 foundationCompose="1.7.6"
-stripeAndroid = "23.3.1"
+stripeAndroid = "21.8.0"
 
 [libraries]
 androidx-animation-core = { module = "androidx.compose.animation:animation-core", version.ref = "animationGraphics" }
