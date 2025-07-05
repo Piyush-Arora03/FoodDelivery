@@ -98,6 +98,7 @@ androidx-compose-animation = { group = "androidx.compose.animation", name = "ani
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationCompose" }
 stripe-android = { module = "com.stripe:stripe-android", version.ref = "stripeAndroid" }
 
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
