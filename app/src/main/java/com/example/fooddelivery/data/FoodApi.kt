@@ -2,15 +2,22 @@ package com.example.fooddelivery.data
 
 import com.example.fooddelivery.data.modle.AddToCartRequest
 import com.example.fooddelivery.data.modle.AddToCartResponse
+import com.example.fooddelivery.data.modle.Address
 import com.example.fooddelivery.data.modle.AddressListResponse
 import com.example.fooddelivery.data.modle.AuthResponse
 import com.example.fooddelivery.data.modle.CartResponse
 import com.example.fooddelivery.data.modle.CategoriesResponse
+import com.example.fooddelivery.data.modle.ConfirmPaymentRequest
+import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
 import com.example.fooddelivery.data.modle.OAuthRequest
+import com.example.fooddelivery.data.modle.OrderListResponse
+import com.example.fooddelivery.data.modle.PaymentIntentRequest
+import com.example.fooddelivery.data.modle.PaymentIntentResponse
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.data.modle.RestaurantResponse
+import com.example.fooddelivery.data.modle.ReverseGeocodeRequest
 import com.example.fooddelivery.data.modle.SignInRequest
 import com.example.fooddelivery.data.modle.SignUpRequest
 import com.example.fooddelivery.data.modle.UpdateCartItemRequest
@@ -63,4 +70,19 @@ interface FoodApi {
 
     @GET("/addresses")
     suspend fun getAddresses():Response<AddressListResponse>
+
+    @POST("/addresses/reverse-geocode")
+    suspend fun reverseGeocode(@Body request: ReverseGeocodeRequest):Response<Address>
+
+    @POST("/addresses")
+    suspend fun addAddress(@Body request: Address): Response<GenericMsgResponse>
+
+    @POST("/payments/create-intent")
+    suspend fun createPaymentIntent(@Body request: PaymentIntentRequest):Response<PaymentIntentResponse>
+
+    @POST("/payments/confirm/{paymentIntentId}")
+    suspend fun verifyPurchase(@Body request:ConfirmPaymentRequest,@Path("paymentIntentId") paymentIntentId:String): Response<ConfirmPaymentResponse>
+
+    @GET("/orders")
+    suspend fun getOrders():Response<OrderListResponse>
 }

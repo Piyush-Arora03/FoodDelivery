@@ -1,3 +1,3 @@
 package com.example.fooddelivery
 
-val GoogleServiceClientId="636386831159-s7o364603tfb0o6s7b50nalcjeip1fo8.apps.googleusercontent.com"
+val GoogleServiceClientId="862573392359-g75s2h2efvdt6217kmge2muelh8lhkqq.apps.googleusercontent.com"

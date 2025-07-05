@@ -20,7 +20,6 @@ class AddressListViewModel@Inject constructor(val foodApi: FoodApi):ViewModel(){
     val uiState=_uiState.asStateFlow()
     private val _navigationEvent= MutableSharedFlow<AddressListEvent>()
     val navigationEvent=_navigationEvent.asSharedFlow()
-
     init{
         getAddress()
     }
@@ -42,10 +41,15 @@ class AddressListViewModel@Inject constructor(val foodApi: FoodApi):ViewModel(){
             }
         }
     }
-
+    fun onAddressClicked(address: Address) {
+        viewModelScope.launch {
+            _navigationEvent.emit(AddressListEvent.NavigateBack(address))
+        }
+    }
     sealed class AddressListEvent{
         object NavigateToEditAddress : AddressListEvent()
         object NavigateToAddAddress : AddressListEvent()
+        data class NavigateBack(val address: Address) : AddressListEvent()
     }
 
     sealed class AddressListUiState{

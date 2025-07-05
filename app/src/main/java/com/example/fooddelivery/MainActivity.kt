@@ -68,6 +68,8 @@ import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
 import com.example.fooddelivery.navigation.NotificationScreen
+import com.example.fooddelivery.navigation.OrderSuccessScreen
+import com.example.fooddelivery.navigation.OrdersListScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.navigation.foodItemNavType
@@ -80,6 +82,8 @@ import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.order_success.OrderSuccess
+import com.example.fooddelivery.ui.screens.orders.OrdersList
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.ui.theme.Mustard
@@ -105,6 +109,7 @@ class MainActivity : ComponentActivity() {
         object Home:BottomNavItems(HomeScreen,R.drawable.nav_home)
         object Cart:BottomNavItems(CartScreen,R.drawable.nav_cart)
         object Notification:BottomNavItems(NotificationScreen,R.drawable.nav_notification)
+        object Orders:BottomNavItems(OrdersListScreen,R.drawable.ic_order)
     }
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -139,13 +144,14 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             FoodDeliveryTheme {
-                var showBottomNavSheet= remember {
+                val showBottomNavSheet= remember {
                     mutableStateOf(false)
                 }
                 val bottomNavItems= listOf(
                     BottomNavItems.Home,
                     BottomNavItems.Cart,
-                    BottomNavItems.Notification)
+                    BottomNavItems.Notification,
+                    BottomNavItems.Orders)
                 val navController= rememberNavController()
                 val cartViewModel:CartViewModel=hiltViewModel()
                 Scaffold(modifier = Modifier.fillMaxSize(),
@@ -262,6 +268,13 @@ class MainActivity : ComponentActivity() {
                             composable<AddAddressScreen> {
                                 showBottomNavSheet.value=false
                                 AddAddress(navController = navController)
+                            }
+                            composable<OrderSuccessScreen> {
+                                val data=it.toRoute<OrderSuccessScreen>()
+                                OrderSuccess(data.orderId,navController)
+                            }
+                            composable<OrdersListScreen> {
+                                OrdersList(navController)
                             }
                         }
                     }
