@@ -77,7 +77,6 @@ fun SharedTransitionScope.RestaurantDetailScreen(
         viewModel.getFoodItem(restaurantId)
     }
     LazyColumn {
-        // ✅ Single Column Header
         item {
             RestaurantHeader(
                 restaurantId,

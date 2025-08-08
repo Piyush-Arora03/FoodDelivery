@@ -70,6 +70,9 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(navController: NavController,viewModel: CartViewModel) {
+    LaunchedEffect(Unit) {
+        viewModel.getCart()
+    }
     val uiState=viewModel.uiState.collectAsState()
     val showErrorDialog= remember {
         mutableStateOf(false)

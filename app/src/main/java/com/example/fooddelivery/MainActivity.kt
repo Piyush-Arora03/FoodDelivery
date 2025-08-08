@@ -68,6 +68,7 @@ import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
 import com.example.fooddelivery.navigation.NotificationScreen
+import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.navigation.OrderSuccessScreen
 import com.example.fooddelivery.navigation.OrdersListScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
@@ -82,6 +83,7 @@ import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.order_detail.OrderDetail
 import com.example.fooddelivery.ui.screens.order_success.OrderSuccess
 import com.example.fooddelivery.ui.screens.orders.OrdersList
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
@@ -275,6 +277,10 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<OrdersListScreen> {
                                 OrdersList(navController)
+                            }
+                            composable<OrderDetailScreen> {
+                                val data=it.toRoute<OrderDetailScreen>()
+                                OrderDetail(navController,data.orderId)
                             }
                         }
                     }

@@ -12,6 +12,7 @@ import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
 import com.example.fooddelivery.data.modle.OAuthRequest
+import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.modle.OrderListResponse
 import com.example.fooddelivery.data.modle.PaymentIntentRequest
 import com.example.fooddelivery.data.modle.PaymentIntentResponse
@@ -85,4 +86,7 @@ interface FoodApi {
 
     @GET("/orders")
     suspend fun getOrders():Response<OrderListResponse>
+
+    @GET("/orders/{orderId}")
+    suspend fun getOrdersDetails(@Path("orderId") orderId:String):Response<Order>
 }

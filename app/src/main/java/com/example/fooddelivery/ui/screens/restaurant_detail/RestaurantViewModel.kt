@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,37 +35,40 @@ class RestaurantViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(
                     _uiState.value=RestaurantUiState.Success(it.data.foodItems)
                 }
                 is ApiResponses.Error->{
-                    val error=(it as ApiResponses.Error).code
-                    when(error){
-                        404->{
-                            errMsg="Not Found"
-                            errDescription="The requested resource was not found"
-                        }
-                        401->{
-                            errMsg="Unauthorized"
-                            errDescription="The request requires user authentication"
-                        }
-                        500->{
-                            errMsg="Internal Server Error"
-                            errDescription="The server encountered an unexpected condition that prevented it from fulfilling the request"
-                        }
-                        else->{
-                            errMsg="Something went wrong"
-                            errDescription="The request could not be completed due to a network error"
-                        }
-                    }
+                    _uiState.value = RestaurantUiState.Error(it.msg)
                     _navigationEvent.emit(RestaurantNavigationEvent.ShowErrorDialog)
-                    _uiState.value=RestaurantUiState.Error
                 }
                 is ApiResponses.Exception->{
-                    errMsg="Something went wrong"
-                    errDescription=(it as ApiResponses.Exception).exception
+                    handleException(it.exception)
                     _navigationEvent.emit(RestaurantNavigationEvent.ShowErrorDialog)
-                    _uiState.value=RestaurantUiState.Error
                 }
             }
         }
     }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is HttpException -> {
+                _uiState.value = RestaurantUiState.Error("HTTP Error: ${exception.code()}")
+                errMsg = "Error"
+                errDescription = "HTTP Error: ${exception.code()}"
+            }
+
+            is IOException -> {
+                _uiState.value =
+                    RestaurantUiState.Error("Network Error: Please check your internet connection")
+                errMsg = "Error"
+                errDescription = "Network Error: Please check your internet connection"
+            }
+
+            else -> {
+                _uiState.value = RestaurantUiState.Error("Something went wrong")
+                errMsg = "Error"
+                errDescription = "Something went wrong"
+            }
+        }
+    }
+
     fun resetUi(){
         _uiState.value=RestaurantUiState.Nothing
     }
@@ -75,7 +80,7 @@ class RestaurantViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(
 
     sealed class RestaurantUiState{
         object Loading:RestaurantUiState()
-        object Error:RestaurantUiState()
+        data class Error(val message: String):RestaurantUiState()
         data class Success(val data: List<FoodItem>):RestaurantUiState()
         object Nothing:RestaurantUiState()
     }
