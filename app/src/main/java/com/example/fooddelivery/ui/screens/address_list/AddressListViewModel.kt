@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,8 +36,8 @@ class AddressListViewModel@Inject constructor(val foodApi: FoodApi):ViewModel(){
                     is ApiResponses.Error->{
                         _uiState.value=AddressListUiState.Error(it.msg)
                     }
-                    else->{
-                        _uiState.value=AddressListUiState.Error("Something went wrong")
+                    is ApiResponses.Exception -> {
+                        handleException(it.exception)
                     }
                 }
             }
@@ -46,6 +48,24 @@ class AddressListViewModel@Inject constructor(val foodApi: FoodApi):ViewModel(){
             _navigationEvent.emit(AddressListEvent.NavigateBack(address))
         }
     }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is HttpException -> {
+                _uiState.value = AddressListUiState.Error("HTTP Error: ${exception.code()}")
+            }
+
+            is IOException -> {
+                _uiState.value =
+                    AddressListUiState.Error("Network Error: Please check your internet connection")
+            }
+
+            else -> {
+                _uiState.value = AddressListUiState.Error("Something went wrong")
+            }
+        }
+    }
+
     sealed class AddressListEvent{
         object NavigateToEditAddress : AddressListEvent()
         object NavigateToAddAddress : AddressListEvent()

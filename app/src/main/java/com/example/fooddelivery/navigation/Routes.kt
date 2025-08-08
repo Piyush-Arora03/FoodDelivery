@@ -38,4 +38,7 @@ object AddAddressScreen:NavRoutes
 data class OrderSuccessScreen(val orderId:String):NavRoutes
 
 @Serializable
+data class OrderDetailScreen(val orderId:String):NavRoutes
+
+@Serializable
 object OrdersListScreen:NavRoutes

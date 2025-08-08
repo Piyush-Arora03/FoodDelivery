@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,8 +42,7 @@ class OrdersListViewModel @Inject constructor(val foodApi: FoodApi):ViewModel() 
                             _navigationEvent.emit(OrderListNavigationEvent.ShowErrorDialog)
                         }
                         is ApiResponses.Exception -> {
-                            _uiState.value=UiState.Error("Something went wrong")
-                            errMsg="Error"
+                            handleException(it.exception)
                             _navigationEvent.emit(OrderListNavigationEvent.ShowErrorDialog)
                         }
                         is ApiResponses.Success -> {
@@ -60,7 +61,7 @@ class OrdersListViewModel @Inject constructor(val foodApi: FoodApi):ViewModel() 
     }
 
     fun resetUi(){
-        _uiState.value=UiState.Nothing
+        getOrderList()
     }
 
     fun navigateToOrderDetailScreen(order: Order){
@@ -68,6 +69,27 @@ class OrdersListViewModel @Inject constructor(val foodApi: FoodApi):ViewModel() 
             _navigationEvent.emit(OrderListNavigationEvent.NavigateToOrderDetails(order))
         }
     }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is HttpException -> {
+                _uiState.value = UiState.Error("HTTP Error: ${exception.code()}")
+                errMsg = "Error"
+            }
+
+            is IOException -> {
+                _uiState.value =
+                    UiState.Error("Network Error: Please check your internet connection")
+                errMsg = "Error"
+            }
+
+            else -> {
+                _uiState.value = UiState.Error("Something went wrong")
+                errMsg = "Error"
+            }
+        }
+    }
+
     sealed class OrderListNavigationEvent{
         object NavigateBack:OrderListNavigationEvent()
         data class NavigateToOrderDetails(val order:Order):OrderListNavigationEvent()

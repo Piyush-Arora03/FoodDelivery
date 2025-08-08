@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,8 +45,8 @@ class AddAddressViewModel @Inject constructor(val foodApi: FoodApi,private val l
                     is ApiResponses.Error->{
                         _uiState.value=AddAddressUiState.Error(it.msg)
                     }
-                    else->{
-                        _uiState.value=AddAddressUiState.Error("Failed to get address")
+                    is ApiResponses.Exception -> {
+                        handleException(it.exception)
                     }
                 }
             }
@@ -66,10 +68,27 @@ class AddAddressViewModel @Inject constructor(val foodApi: FoodApi,private val l
                     is ApiResponses.Error->{
                         _uiState.value=AddAddressUiState.Error(it.msg)
                     }
-                    else->{
-                        _uiState.value=AddAddressUiState.Error("Something went wrong")
+                    is ApiResponses.Exception -> {
+                        handleException(it.exception)
                     }
                 }
+            }
+        }
+    }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is HttpException -> {
+                _uiState.value = AddAddressUiState.Error("HTTP Error: ${exception.code()}")
+            }
+
+            is IOException -> {
+                _uiState.value =
+                    AddAddressUiState.Error("Network Error: Please check your internet connection")
+            }
+
+            else -> {
+                _uiState.value = AddAddressUiState.Error("Something went wrong")
             }
         }
     }

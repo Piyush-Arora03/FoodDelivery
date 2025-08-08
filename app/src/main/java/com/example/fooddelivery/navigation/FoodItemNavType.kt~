@@ -1,0 +1,28 @@
+import android.os.Bundle
+import androidx.navigation.NavType
+import com.example.fooddelivery.data.modle.FoodItem
+import kotlinx.serialization.json.Json
+import java.net.URLDecoder
+import java.net.URLEncoder
+
+val foodItemNavType = object : NavType<FoodItem>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): FoodItem {
+        val encodedJson = bundle.getString(key) ?: error("Missing FoodItem string in bundle")
+        val decodedJson = URLDecoder.decode(encodedJson, "UTF-8")
+        return Json.decodeFromString(FoodItem.serializer(), decodedJson)
+    }
+
+    override fun parseValue(value: String): FoodItem {
+        val decodedJson = URLDecoder.decode(value, "UTF-8")
+        return Json.decodeFromString(FoodItem.serializer(), decodedJson)
+    }
+
+    override fun serializeAsValue(value: FoodItem): String {
+        val json = Json.encodeToString(FoodItem.serializer(), value)
+        return URLEncoder.encode(json, "UTF-8")
+    }
+
+    override fun put(bundle: Bundle, key: String, value: FoodItem) {
+        bundle.putString(key, serializeAsValue(value))
+    }
+}

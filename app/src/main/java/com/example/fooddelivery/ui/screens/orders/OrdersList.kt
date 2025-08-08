@@ -1,11 +1,11 @@
 package com.example.fooddelivery.ui.screens.orders
 
-import android.graphics.Paint.Align
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,18 +17,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,21 +42,38 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Order
+import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.address_list.OnUiStateError
 import com.example.fooddelivery.ui.theme.Orange
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrdersList(navController: NavController,viewModel: OrdersListViewModel= hiltViewModel()) {
     val uiState=viewModel.uiState.collectAsStateWithLifecycle().value
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collectLatest {
+            when(it){
+                is OrdersListViewModel.OrderListNavigationEvent.NavigateToOrderDetails ->{
+                    navController.navigate(OrderDetailScreen(it.order.id))
+                }
+                is OrdersListViewModel.OrderListNavigationEvent.NavigateBack ->{
+                    navController.popBackStack()
+                }
+                is OrdersListViewModel.OrderListNavigationEvent.ShowErrorDialog -> {}
+            }
+        }
+    }
+
     val showErrorDialog= remember {
         mutableStateOf(false)
     }
@@ -71,12 +92,46 @@ fun OrdersList(navController: NavController,viewModel: OrdersListViewModel= hilt
         }
         is OrdersListViewModel.UiState.Nothing -> {
             showErrorDialog.value=false
+            viewModel.resetUi()
         }
         is OrdersListViewModel.UiState.OrderList -> {
             val orderList=(uiState as OrdersListViewModel.UiState.OrderList).orderList
-            LazyColumn {
-                items(orderList.size){
-                    OrderListItem(orderList[it],onClick={viewModel.navigateToOrderDetailScreen(orderList[it])})
+            val tabList= listOf("Upcoming","History")
+            var selectedTabIndex by remember { mutableStateOf(0) }
+            Column {
+                OrdersHeaderView { navController.popBackStack() }
+                TabRow(selectedTabIndex = selectedTabIndex,
+                    modifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(36.dp))
+                        .padding(vertical = 16.dp, horizontal = 12.dp)
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(36.dp)),
+                    divider = {},
+                    indicator = {},
+                    containerColor = Color.White,
+                    ) {
+                    tabList.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = { Text(text = title, color = if (selectedTabIndex == index) Color.White else Orange,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = poppinsFontFamily,
+                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))},
+                            modifier = Modifier.padding(4.dp)
+                                .clip(RoundedCornerShape(36.dp))
+                                .background(if (selectedTabIndex == index) Orange else Color.White)
+                        )
+                    }
+                }
+                val filteredOrders = when (selectedTabIndex) {
+                    0 -> orderList.filter { it.status=="PENDING_ACCEPTANCE" }
+                    1 -> orderList.filter { it.status!="PENDING_ACCEPTANCE" }
+                    else -> emptyList()
+                }
+                LazyColumn {
+                    items(filteredOrders.size){
+                        OrderListItem(filteredOrders[it],onClick={viewModel.navigateToOrderDetailScreen(orderList[it])})
+                    }
                 }
             }
         }
@@ -165,5 +220,18 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
             )
         }
+    }
+}
+
+@Composable
+fun OrdersHeaderView(onBack:()->Unit){
+    Box(modifier = Modifier.fillMaxWidth()) {
+        IconButton(onClick = {onBack()}, modifier = Modifier
+            .padding(8.dp)
+            .align(Alignment.CenterStart)) {
+            Image(painter = painterResource(R.drawable.back_button), contentDescription = null, modifier = Modifier.size(60.dp))
+        }
+        Text(text = "My Orders", modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.padding(8.dp))
     }
 }

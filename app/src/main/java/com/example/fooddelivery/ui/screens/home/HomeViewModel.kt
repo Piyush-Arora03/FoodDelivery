@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,10 +50,10 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
                         Log.d(TAG,categories.toString())
                     }
                     is ApiResponses.Error->{
-                        _uiState.value=HomeScreenState.Error
+                        _uiState.value=HomeScreenState.Error(it.msg)
                     }
-                    else->{
-                        _uiState.value=HomeScreenState.Empty
+                    is ApiResponses.Exception -> {
+                        handleException(it.exception)
                     }
                 }
             }
@@ -69,10 +71,10 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
                     Log.d(TAG,restaurants.toString())
                 }
                 is ApiResponses.Error->{
-                    _uiState.value=HomeScreenState.Error
+                    _uiState.value=HomeScreenState.Error(it.msg)
                 }
-                else->{
-                    _uiState.value=HomeScreenState.Empty
+                is ApiResponses.Exception -> {
+                    handleException(it.exception)
                 }
             }
         }
@@ -85,10 +87,27 @@ class HomeViewModel @Inject constructor(private val foodApi:FoodApi) :ViewModel(
         }
     }
 
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is HttpException -> {
+                _uiState.value = HomeScreenState.Error("HTTP Error: ${exception.code()}")
+            }
+
+            is IOException -> {
+                _uiState.value =
+                    HomeScreenState.Error("Network Error: Please check your internet connection")
+            }
+
+            else -> {
+                _uiState.value = HomeScreenState.Error("Something went wrong")
+            }
+        }
+    }
+
     sealed class HomeScreenState{
         object Loading:HomeScreenState()
         object Success:HomeScreenState()
-        object Error:HomeScreenState()
+        data class Error(val message: String):HomeScreenState()
         object Empty:HomeScreenState()
     }
 
