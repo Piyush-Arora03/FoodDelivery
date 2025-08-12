@@ -9,8 +9,11 @@ import com.example.fooddelivery.data.modle.CartResponse
 import com.example.fooddelivery.data.modle.CategoriesResponse
 import com.example.fooddelivery.data.modle.ConfirmPaymentRequest
 import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
+import com.example.fooddelivery.data.modle.FCMTokenRequest
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
+import com.example.fooddelivery.data.modle.Notification
+import com.example.fooddelivery.data.modle.NotificationResponse
 import com.example.fooddelivery.data.modle.OAuthRequest
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.modle.OrderListResponse
@@ -28,6 +31,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -89,4 +93,13 @@ interface FoodApi {
 
     @GET("/orders/{orderId}")
     suspend fun getOrdersDetails(@Path("orderId") orderId:String):Response<Order>
+
+    @PUT("/notifications/fcm-token")
+    suspend fun updateToken(@Body token: FCMTokenRequest):Response<GenericMsgResponse>
+
+    @GET("/notifications")
+    suspend fun getNotifications():Response<NotificationResponse>
+
+    @POST("/notifications/{id}/read")
+    suspend fun readNotification(@Path("id") id:String):Response<GenericMsgResponse>
 }

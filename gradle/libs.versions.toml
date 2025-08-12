@@ -34,6 +34,9 @@ googleid = "1.1.1"
 animationCompose="1.7.6"
 foundationCompose="1.7.6"
 stripeAndroid = "21.8.0"
+ui = "1.4.0"
+material3 = "1.0.1"
+materialIconsExtended = "1.4.0"
 
 [libraries]
 androidx-animation-core = { module = "androidx.compose.animation:animation-core", version.ref = "animationGraphics" }
@@ -97,8 +100,9 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animationCompose" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationCompose" }
 stripe-android = { module = "com.stripe:stripe-android", version.ref = "stripeAndroid" }
-
-
+ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

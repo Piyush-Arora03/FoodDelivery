@@ -83,6 +83,8 @@ import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.notification.NotificationScreen
+import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
 import com.example.fooddelivery.ui.screens.order_detail.OrderDetail
 import com.example.fooddelivery.ui.screens.order_success.OrderSuccess
 import com.example.fooddelivery.ui.screens.orders.OrdersList
@@ -156,6 +158,7 @@ class MainActivity : ComponentActivity() {
                     BottomNavItems.Orders)
                 val navController= rememberNavController()
                 val cartViewModel:CartViewModel=hiltViewModel()
+                val notificationViewModel: NotificationViewModel =hiltViewModel()
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val currRoute=navController.currentBackStackEntryAsState().value?.destination
@@ -165,13 +168,15 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 bottomNavItems.forEach {item->
                                     val selected=currRoute?.hierarchy?.any { it.route==item.route::class.qualifiedName }==true
-                                    val count=cartViewModel.cartItemCount.collectAsStateWithLifecycle().value
+                                    val cartCount=cartViewModel.cartItemCount.collectAsStateWithLifecycle()
+                                    val notificationCount=notificationViewModel.notificationCount.collectAsStateWithLifecycle()
+                                    Log.d(TAG, "notificationCount: $notificationCount cartCount: $cartCount")
                                     NavigationBarItem(
                                         selected = false,
                                         onClick = {  navController.navigate(item.route)},
                                         icon = {
                                             Box(modifier = Modifier.size(48.dp)) {
-                                                if(item.route==BottomNavItems.Cart.route && count>0)Box(
+                                                if(item.route==BottomNavItems.Cart.route && cartCount.value>0)Box(
                                                     modifier = Modifier
                                                         .size(18.dp)
                                                         .clip(RoundedCornerShape(8.dp))
@@ -179,7 +184,21 @@ class MainActivity : ComponentActivity() {
                                                         .align(Alignment.TopEnd)
                                                     , contentAlignment = Alignment.Center
                                                 ){
-                                                    Text(text=count.toString(), color = Color.White, style = TextStyle(
+                                                    Text(text=cartCount.value.toString(), color = Color.White, style = TextStyle(
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        fontFamily = poppinsFontFamily
+                                                    ))
+                                                }
+                                                if(item.route==BottomNavItems.Notification.route && notificationCount.value>0)Box(
+                                                    modifier = Modifier
+                                                        .size(18.dp)
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(Mustard)
+                                                        .align(Alignment.TopEnd)
+                                                    , contentAlignment = Alignment.Center
+                                                ){
+                                                    Text(text=notificationCount.value.toString(), color = Color.White, style = TextStyle(
                                                         fontSize = 10.sp,
                                                         fontWeight = FontWeight.SemiBold,
                                                         fontFamily = poppinsFontFamily
@@ -259,9 +278,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<NotificationScreen> {
                                 showBottomNavSheet.value=true
-                                Box(){
-
-                                }
+                                NotificationScreen(navController,notificationViewModel)
                             }
                             composable<AddressListScreen> {
                                 showBottomNavSheet.value=false
@@ -279,6 +296,7 @@ class MainActivity : ComponentActivity() {
                                 OrdersList(navController)
                             }
                             composable<OrderDetailScreen> {
+                                showBottomNavSheet.value=false
                                 val data=it.toRoute<OrderDetailScreen>()
                                 OrderDetail(navController,data.orderId)
                             }
