@@ -128,7 +128,6 @@ class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : 
 
     fun navigateToOrderDetail(notification: Notification) {
         viewModelScope.launch {
-            if(!notification.isRead){
                 val response = SafeApiCalls {
                     foodApi.readNotification(notification.id)
                 }
@@ -140,7 +139,6 @@ class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : 
                     is ApiResponses.Error<*> -> TODO()
                     is ApiResponses.Exception<*> -> TODO()
                 }
-            }
         }
     }
 

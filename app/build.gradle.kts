@@ -23,6 +23,26 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions+="appType"
+
+    productFlavors {
+        create("customer"){
+            dimension="appType"
+            applicationIdSuffix=".customer"
+            versionNameSuffix="-customer"
+        }
+        create("rider"){
+            dimension="appType"
+            applicationIdSuffix=".rider"
+            versionNameSuffix="-rider"
+        }
+        create("restaurant"){
+            dimension="appType"
+            applicationIdSuffix=".restaurant"
+            versionNameSuffix="-restaurant"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
