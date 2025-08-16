@@ -48,7 +48,7 @@ import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Category
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
 
@@ -91,7 +91,7 @@ fun SharedTransitionScope.HomeScreen(navController: NavController,viewModel: Hom
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 13.sp
                         ),
-                            color = Orange,
+                            color = Primary,
                             textAlign = TextAlign.End,)
                     } }
                 Spacer(modifier = Modifier.padding(10.dp))

@@ -1,6 +1,8 @@
 package com.example.fooddelivery
 
 import android.animation.ObjectAnimator
+import android.app.ComponentCaller
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +11,7 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -18,60 +21,54 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
 import com.example.fooddelivery.navigation.AuthScreen
-import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
-import com.example.fooddelivery.navigation.NotificationScreen
-import com.example.fooddelivery.navigation.OrdersListScreen
+import com.example.fooddelivery.navigation.OrderDetailScreen
+import com.example.fooddelivery.navigation.RestaurantNotificationScreen
+import com.example.fooddelivery.navigation.RestaurantOrdersScreen
 import com.example.fooddelivery.navigation.SignUpScreen
+import com.example.fooddelivery.notification.MessagingService
 import com.example.fooddelivery.ui.CustomNavHost
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.home.HomeViewModel
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
-import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
+import com.example.fooddelivery.ui.screens.order_detail.RestaurantOrderDetailScreen
+import com.example.fooddelivery.ui.screens.order_list.OrderListScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
-import com.example.fooddelivery.ui.theme.Mustard
-import com.example.fooddelivery.ui.theme.Orange
-import com.example.fooddelivery.ui.theme.poppinsFontFamily
+import com.example.fooddelivery.ui.theme.Primary
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,12 +83,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var session: FoodHubAuthSession
     val TAG="MainActivity"
+    val viewModel by viewModels<HomeViewModel>()
 
     sealed class BottomNavItems(val route:NavRoutes,val icon:Int){
         object Home:BottomNavItems(HomeScreen,R.drawable.nav_home)
-        object Cart:BottomNavItems(CartScreen,R.drawable.nav_cart)
-        object Notification:BottomNavItems(NotificationScreen,R.drawable.nav_notification)
-        object Orders:BottomNavItems(OrdersListScreen,R.drawable.ic_order)
+        object Orders:BottomNavItems(RestaurantOrdersScreen,R.drawable.ic_order)
+        object Notifications: BottomNavItems(RestaurantNotificationScreen,R.drawable.nav_notification)
     }
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -131,11 +128,9 @@ class MainActivity : ComponentActivity() {
                 }
                 val bottomNavItems= listOf(
                     BottomNavItems.Home,
-                    BottomNavItems.Cart,
-                    BottomNavItems.Notification,
-                    BottomNavItems.Orders)
+                    BottomNavItems.Orders,
+                    BottomNavItems.Notifications)
                 val navController= rememberNavController()
-                val notificationViewModel: NotificationViewModel =hiltViewModel()
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val currRoute=navController.currentBackStackEntryAsState().value?.destination
@@ -145,30 +140,14 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 bottomNavItems.forEach {item->
                                     val selected=currRoute?.hierarchy?.any { it.route==item.route::class.qualifiedName }==true
-                                    val notificationCount=notificationViewModel.notificationCount.collectAsStateWithLifecycle()
-                                    Log.d(TAG, "notificationCount: $notificationCount ")
                                     NavigationBarItem(
                                         selected = false,
                                         onClick = {  navController.navigate(item.route)},
                                         icon = {
                                             Box(modifier = Modifier.size(48.dp)) {
-                                                if(item.route==BottomNavItems.Notification.route && notificationCount.value>0)Box(
-                                                    modifier = Modifier
-                                                        .size(18.dp)
-                                                        .clip(RoundedCornerShape(8.dp))
-                                                        .background(Mustard)
-                                                        .align(Alignment.TopEnd)
-                                                    , contentAlignment = Alignment.Center
-                                                ){
-                                                    Text(text=notificationCount.value.toString(), color = Color.White, style = TextStyle(
-                                                        fontSize = 10.sp,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        fontFamily = poppinsFontFamily
-                                                    ))
-                                                }
                                                 Icon(painter = painterResource(item.icon),
                                                     contentDescription = null,
-                                                    tint = if(selected) Orange else Color.Gray,
+                                                    tint = if(selected) Primary else Color.Gray,
                                                     modifier = Modifier.align(Alignment.Center))
                                             }
                                         }
@@ -215,15 +194,24 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<HomeScreen> {
                                 showBottomNavSheet.value=true
-                                RestaurantHomeScreen(navController=navController, animatedVisibilityScope = this)
+                                HomeScreen(navController=navController)
                             }
                             composable<LogInScreen> {
                                 showBottomNavSheet.value=false
                                 SignInScreen(navController=navController)
                             }
-                            composable<NotificationScreen> {
+                            composable<RestaurantOrdersScreen> {
                                 showBottomNavSheet.value=true
-                                NotificationScreen(navController,notificationViewModel)
+                                OrderListScreen(navController)
+                            }
+                            composable<RestaurantNotificationScreen> {
+                                showBottomNavSheet.value=true
+                                NotificationScreen(navController)
+                            }
+                            composable<OrderDetailScreen> {
+                                showBottomNavSheet.value=false
+                                val orderId=it.toRoute<OrderDetailScreen>()
+                                RestaurantOrderDetailScreen(orderId.orderId,navController)
                             }
                         }
                     }
@@ -236,6 +224,23 @@ class MainActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             showSplashScreen=false
+            processIntent(intent,viewModel)
+        }
+    }
+
+
+    override fun onNewIntent(intent: Intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            super.onNewIntent(intent)
+        }
+        processIntent(intent,viewModel)
+    }
+
+    fun processIntent(intent: Intent,viewModel: HomeViewModel){
+        if(intent.hasExtra(MessagingService.OrderId)){
+            val orderId=intent.getStringExtra(MessagingService.OrderId)
+            viewModel.navigateToOrderDetail(orderId!!)
+            intent.removeExtra(MessagingService.OrderId)
         }
     }
 }

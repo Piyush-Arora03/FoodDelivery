@@ -35,11 +35,13 @@ android {
             dimension="appType"
             applicationIdSuffix=".rider"
             versionNameSuffix="-rider"
+            resValue("string","app_name","FD Rider")
         }
         create("restaurant"){
             dimension="appType"
             applicationIdSuffix=".restaurant"
             versionNameSuffix="-restaurant"
+            resValue("string","app_name","FD Restaurant")
         }
     }
 

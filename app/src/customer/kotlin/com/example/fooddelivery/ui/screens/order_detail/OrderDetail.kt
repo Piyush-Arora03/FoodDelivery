@@ -39,7 +39,8 @@ import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.modle.OrderItem
 import com.example.fooddelivery.ui.screens.orders.OrdersListViewModel
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
+import com.example.fooddelivery.utils.UiState
 
 @Composable
 fun OrderDetail(
@@ -52,9 +53,6 @@ fun OrderDetail(
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.let {
             when(it){
-                is OrderDetailViewModel.OrderDetailNavigationEvent.NavigateBack ->{
-                    navController.popBackStack()
-                }
             }
         }
     }
@@ -62,7 +60,7 @@ fun OrderDetail(
         OrderDetailHeaderView(onBack = { navController.popBackStack() })
 
         when (uiState) {
-            is OrderDetailViewModel.UiState.Loading -> {
+            is UiState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -70,20 +68,18 @@ fun OrderDetail(
                     CircularProgressIndicator()
                 }
             }
-
-            is OrderDetailViewModel.UiState.OrderDetail -> {
-                OrderDetailContent(order = uiState.orderDetail)
+            is UiState.Success -> {
+                OrderDetailContent(order = uiState.data)
             }
 
-            is OrderDetailViewModel.UiState.Error -> {
+            is UiState.Error -> {
                 OnUiStateError(
-                    // This assumes your ViewModel has a function to retry fetching data
-                    onClick = { viewModel.getOrderDetail(orderId) },
-                    text = uiState.errMsg
+                    onClick = { viewModel.getOrderDetails(orderId) },
+                    text = viewModel.errMsg
                 )
             }
-            is OrderDetailViewModel.UiState.Nothing -> {
-                viewModel.resetUi(orderId)
+            is UiState.Empty -> {
+
             }
         }
     }
@@ -135,7 +131,7 @@ fun OrderSummaryCard(order: Order) {
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             InfoRow(label = "Order ID", value = order.id)
-            InfoRow(label = "Status", value = order.status, valueColor = Orange, isBold = true)
+            InfoRow(label = "Status", value = order.status, valueColor = Primary, isBold = true)
         }
     }
 }
@@ -148,7 +144,7 @@ fun OrderItemRow(item: OrderItem) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "${item.quantity}x", style = MaterialTheme.typography.bodyLarge, color = Orange)
+        Text(text = "${item.quantity}x", style = MaterialTheme.typography.bodyLarge, color = Primary)
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = item.menuItemName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
         Text(text = "$${"%.2f".format(6.00 * item.quantity)}", style = MaterialTheme.typography.bodyLarge)
@@ -208,7 +204,7 @@ fun OnUiStateError(onClick: () -> Unit, text: String) {
     ) {
         Button(
             onClick = { onClick.invoke() },
-            colors = ButtonDefaults.buttonColors(containerColor = Orange),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(

@@ -12,24 +12,28 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -52,15 +56,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import com.example.fooddelivery.R
 import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -151,7 +153,7 @@ fun FoodHubTextFiled(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = RoundedCornerShape(10.dp),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors().copy(
-        focusedIndicatorColor= Orange,
+        focusedIndicatorColor= Primary,
         unfocusedIndicatorColor = Color.Gray.copy(alpha = 0.4f)
     )
 ){
@@ -239,7 +241,7 @@ fun BasicDialog(
         Button(
             onClick = onClick,
             modifier = Modifier.clip(RoundedCornerShape(16.dp)),
-            colors = ButtonDefaults.buttonColors(Orange)
+            colors = ButtonDefaults.buttonColors(Primary)
         ) {
             Text(text = "OK", modifier = Modifier.padding(4.dp))
         }
@@ -310,6 +312,38 @@ fun CustomNavHost(
         builder = builder,
         sizeTransform = sizeTransform
     )
+}
+
+@Composable
+fun HeaderView(onBack: () -> Unit,name:String) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        IconButton(
+            onClick = { onBack() },
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterStart)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.back_button),
+                contentDescription = "Back",
+                modifier = Modifier.size(60.dp)
+            )
+        }
+        Text(
+            text = name,
+            modifier = Modifier.align(Alignment.Center),
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
+}
+
+@Composable
+fun Loading(){
+    Box(modifier = Modifier.fillMaxSize()){
+        CircularProgressIndicator(modifier = Modifier.align(
+            alignment = Alignment.Center
+        ))
+    }
 }
 
 

@@ -52,7 +52,7 @@ import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.address_list.OnUiStateError
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
 
@@ -113,13 +113,13 @@ fun OrdersList(navController: NavController,viewModel: OrdersListViewModel= hilt
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
-                            text = { Text(text = title, color = if (selectedTabIndex == index) Color.White else Orange,
+                            text = { Text(text = title, color = if (selectedTabIndex == index) Color.White else Primary,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontFamily = poppinsFontFamily,
                                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))},
                             modifier = Modifier.padding(4.dp)
                                 .clip(RoundedCornerShape(36.dp))
-                                .background(if (selectedTabIndex == index) Orange else Color.White)
+                                .background(if (selectedTabIndex == index) Primary else Color.White)
                         )
                     }
                 }
@@ -189,7 +189,7 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
             Text(
                 text = order.id,
                 style = MaterialTheme.typography.titleSmall,
-                color = Orange,
+                color = Primary,
                 maxLines = 1,
                 textAlign = TextAlign.End,
                 modifier = Modifier.padding(bottom = 24.dp)
@@ -206,10 +206,10 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
 
         Button(
             onClick = onClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Orange),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary),
             shape = RoundedCornerShape(26.dp),
             modifier = Modifier
-                .shadow(8.dp, RoundedCornerShape(26.dp), clip = false, spotColor = Orange, ambientColor = Orange)
+                .shadow(8.dp, RoundedCornerShape(26.dp), clip = false, spotColor = Primary, ambientColor = Primary)
                 .padding(bottom = 8.dp)
                 .align(Alignment.CenterHorizontally)
         ) {

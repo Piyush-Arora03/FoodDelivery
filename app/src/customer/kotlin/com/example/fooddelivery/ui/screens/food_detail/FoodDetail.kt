@@ -52,7 +52,7 @@ import com.example.fooddelivery.navigation.CartScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.restaurant_detail.HeaderDetails
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantHeader
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -112,7 +112,7 @@ fun SharedTransitionScope.FoodDetail(
             navController.popBackStack() },{})
         HeaderDetails(animatedVisibilityScope,foodItem.restaurantId,foodItem.name,foodItem.description)
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = "$"+foodItem.price.toString(), modifier = Modifier.sharedElement(state = rememberSharedContentState("price/${foodItem.id}"),animatedVisibilityScope).padding(start = 10.dp), color = Orange,
+            Text(text = "$"+foodItem.price.toString(), modifier = Modifier.sharedElement(state = rememberSharedContentState("price/${foodItem.id}"),animatedVisibilityScope).padding(start = 10.dp), color = Primary,
                 style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -123,7 +123,7 @@ fun SharedTransitionScope.FoodDetail(
             onClick = {
                 viewModel.addToCart(foodItem.restaurantId,foodItem.id)
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Orange),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .width(270.dp),
@@ -172,14 +172,14 @@ fun SharedTransitionScope.FoodDetail(
                 Button(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), onClick = {
                     showToast.value=true
                     viewModel.resetUi()
-                }, colors = ButtonDefaults.buttonColors(Orange)) {
+                }, colors = ButtonDefaults.buttonColors(Primary)) {
                     Text(text="OK")
                 }
                 Spacer(modifier = Modifier.padding(2.dp))
                 Button(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), onClick = {
                     viewModel.resetUi()
                     navController.navigate(CartScreen)
-                },colors = ButtonDefaults.buttonColors(Orange)) {
+                },colors = ButtonDefaults.buttonColors(Primary)) {
                     Text(text = "GO TO CART")
                 }
                 Spacer(modifier = Modifier.padding(2.dp))
@@ -199,7 +199,7 @@ fun ItemCounter(
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape)
-                .background(Orange.copy(alpha = 0.1f))
+                .background(Primary.copy(alpha = 0.1f))
                 .clickable { onCounterIncrement.invoke() },
             contentAlignment = Alignment.Center
         ) {
@@ -207,7 +207,7 @@ fun ItemCounter(
                 painter = painterResource(R.drawable.plus),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp).alpha(1.3f)
-                    .shadow(6.dp, spotColor = Orange.copy(0.1f), ambientColor = Orange.copy(0.1f))
+                    .shadow(6.dp, spotColor = Primary.copy(0.1f), ambientColor = Primary.copy(0.1f))
             )
         }
 
@@ -224,7 +224,7 @@ fun ItemCounter(
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape)
-                .background(Orange.copy(alpha = 0.1f))
+                .background(Primary.copy(alpha = 0.1f))
                 .clickable { onCounterDecrement.invoke() },
             contentAlignment = Alignment.Center
         ) {
@@ -232,7 +232,7 @@ fun ItemCounter(
                 painter = painterResource(R.drawable.minus),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp).alpha(1.3f)
-                    .shadow(6.dp, spotColor = Orange.copy(0.1f), ambientColor = Orange.copy(0.1f))
+                    .shadow(6.dp, spotColor = Primary.copy(0.1f), ambientColor = Primary.copy(0.1f))
             )
         }
 

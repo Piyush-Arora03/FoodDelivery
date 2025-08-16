@@ -2,8 +2,6 @@ package com.example.fooddelivery.ui.screens.auth.signup
 
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -28,7 +26,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,29 +38,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.R
-import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.HomeScreen
-import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.FoodHubTextFiled
 import com.example.fooddelivery.ui.GroupSocialButtons
 import com.example.fooddelivery.ui.screens.auth.login.SignInViewModel
-import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
@@ -163,7 +154,7 @@ fun SignInScreen (viewModel: SignInViewModel= hiltViewModel(),navController: Nav
             Spacer(modifier =Modifier.padding(bottom = 50.dp))
             Button(onClick = {
                 viewModel.onSignInClick()
-            }, colors = ButtonDefaults.buttonColors(Orange),
+            }, colors = ButtonDefaults.buttonColors(Primary),
                 modifier = Modifier
                     .fillMaxWidth(0.6f)) {
                 Box(){

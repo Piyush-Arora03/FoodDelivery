@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -52,10 +51,8 @@ import coil.compose.AsyncImage
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.FoodItem
 import com.example.fooddelivery.navigation.FoodDetailScreen
-import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
-import okhttp3.internal.checkOffsetAndCount
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -191,7 +188,7 @@ fun SharedTransitionScope.HeaderDetails(
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
         Image(painter = painterResource(R.drawable.star), contentDescription = null, modifier = Modifier.size(20.dp).padding(start = 8.dp))
         Text(text = " 4.5 (30+) ", modifier = Modifier.padding(start = 4.dp), fontSize = 10.sp)
-        Text(text = " See Review >", modifier = Modifier.padding(start = 4.dp), fontSize = 10.sp, color = Orange)
+        Text(text = " See Review >", modifier = Modifier.padding(start = 4.dp), fontSize = 10.sp, color = Primary)
     }
     Spacer(modifier = Modifier.padding(4.dp))
     Text(text = description, modifier = Modifier.padding(8.dp).sharedElement(state = rememberSharedContentState("description/${restaurantId}"),animatedVisibilityScope)

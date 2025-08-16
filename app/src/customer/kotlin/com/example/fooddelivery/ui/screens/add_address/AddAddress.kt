@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -154,7 +154,7 @@ fun AddAddress(navController: NavController, viewModel: AddAddressViewModel = hi
                             color = Color.Gray
                         )
                     }
-                    Button(colors = ButtonDefaults.buttonColors(Orange), onClick = {
+                    Button(colors = ButtonDefaults.buttonColors(Primary), onClick = {
                         viewModel.onAddAddressClicked(it)
                     }, modifier = Modifier.align(Alignment.CenterEnd), enabled = if(uiState.value is AddAddressViewModel.AddAddressUiState.AddressStoring) false else true) {
                         if(uiState.value is AddAddressViewModel.AddAddressUiState.AddressStoring) {

@@ -32,7 +32,7 @@ import androidx.navigation.NavController
 import com.example.fooddelivery.R
 import com.example.fooddelivery.navigation.AddAddressScreen
 import com.example.fooddelivery.ui.screens.cart.AddressCard
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -108,7 +108,7 @@ fun OnUiStateError(onClick:()->Unit,text:String){
         Button(onClick = {
             onClick.invoke()
         },
-            colors = ButtonDefaults.buttonColors(Orange)) {
+            colors = ButtonDefaults.buttonColors(Primary)) {
             Text(text = text,style=MaterialTheme.typography.titleLarge)
         }
     }

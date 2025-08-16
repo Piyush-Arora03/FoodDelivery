@@ -102,4 +102,12 @@ interface FoodApi {
 
     @POST("/notifications/{id}/read")
     suspend fun readNotification(@Path("id") id:String):Response<GenericMsgResponse>
+
+    @GET("/restaurant-owner/profile")
+    suspend fun getRestaurantProfile() : Response<Restaurant>
+    @GET("/restaurant-owner/orders")
+    suspend fun getRestaurantOrderDetails(@Query("status") status:String): Response<OrderListResponse>
+
+    @PATCH("orders/{orderId}/status")
+    suspend fun updateOrderStatus(@Path("orderId")orderId: String,@Body map:Map<String,String>): Response<GenericMsgResponse>
 }

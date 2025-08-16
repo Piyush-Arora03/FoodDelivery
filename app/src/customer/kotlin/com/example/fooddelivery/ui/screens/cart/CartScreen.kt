@@ -57,7 +57,7 @@ import com.example.fooddelivery.navigation.OrderSuccessScreen
 import com.example.fooddelivery.ui.BasicDialog
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetailViewModel
 import com.example.fooddelivery.ui.screens.food_detail.ItemCounter
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import com.example.fooddelivery.utils.StringUtils
 import com.stripe.android.PaymentConfiguration
@@ -147,7 +147,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                             Spacer(modifier = Modifier.padding(8.dp))
                             AddressCard(address = selectedAddress.value, onAddressClicked = { viewModel.onAddressClicked() })
                             Spacer(modifier = Modifier.padding(8.dp))
-                            Button(onClick = {viewModel.checkout()}, colors = ButtonDefaults.buttonColors(Orange), enabled = selectedAddress.value!=null) {
+                            Button(onClick = {viewModel.checkout()}, colors = ButtonDefaults.buttonColors(Primary), enabled = selectedAddress.value!=null) {
                                 Text(text = "CHECKOUT", fontSize = 16.sp, modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp), fontFamily = poppinsFontFamily)
                             }
                         }
@@ -163,7 +163,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                     Text(text = errMsg, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleLarge)
                     Button(onClick = {viewModel.getCart()},Modifier
                         .clip(RoundedCornerShape(16.dp))
-                        , colors = ButtonDefaults.buttonColors(Orange)) {
+                        , colors = ButtonDefaults.buttonColors(Primary)) {
                         Text(text="RETRY", modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleMedium)
                     }
                 }
@@ -255,7 +255,7 @@ fun CartItemView(item: CartItem,onIncrement:()->Unit,onDecrement:()->Unit,onRemo
                 Text(text = item.menuItemId.description, fontSize = 12.sp, color = Color.Gray)
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "$ "+item.menuItemId.price, fontSize = 16.sp, color = Orange)
+                Text(text = "$ "+item.menuItemId.price, fontSize = 16.sp, color = Primary)
                 Spacer(modifier = Modifier.weight(1f))
                 ItemCounter(onCounterIncrement = {
                         onIncrement.invoke()

@@ -86,7 +86,7 @@ import com.example.fooddelivery.ui.screens.orders.OrdersList
 import com.example.fooddelivery.ui.screens.restaurant_detail.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.ui.theme.Mustard
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -116,29 +116,35 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         var showSplashScreen=true
+        val fromNotification = intent.getBooleanExtra("from_notification", false)
+
         installSplashScreen().apply {
             setKeepOnScreenCondition(){
                 showSplashScreen
             }
-            setOnExitAnimationListener{ screen->
-                val zoomX = ObjectAnimator.ofFloat(
-                    screen.iconView, View.SCALE_X,0.5f,0.0f
-                )
-                val zoomY=ObjectAnimator.ofFloat(
-                    screen.iconView,View.SCALE_Y,0.5f,0.0f
-                )
-                zoomX.duration=1000
-                zoomY.duration=1000
-                zoomX.interpolator=OvershootInterpolator()
-                zoomY.interpolator=OvershootInterpolator()
-                zoomY.doOnEnd {
-                    screen.remove()
+            if (fromNotification) {
+                setKeepOnScreenCondition { false }
+            } else {
+                setOnExitAnimationListener { screen ->
+                    val zoomX = ObjectAnimator.ofFloat(
+                        screen.iconView, View.SCALE_X, 0.5f, 0.0f
+                    )
+                    val zoomY = ObjectAnimator.ofFloat(
+                        screen.iconView, View.SCALE_Y, 0.5f, 0.0f
+                    )
+                    zoomX.duration = 1000
+                    zoomY.duration = 1000
+                    zoomX.interpolator = OvershootInterpolator()
+                    zoomY.interpolator = OvershootInterpolator()
+                    zoomY.doOnEnd {
+                        screen.remove()
+                    }
+                    zoomX.doOnEnd {
+                        screen.remove()
+                    }
+                    zoomX.start()
+                    zoomY.start()
                 }
-                zoomX.doOnEnd {
-                    screen.remove()
-                }
-                zoomX.start()
-                zoomY.start()
             }
         }
         setContent {
@@ -201,7 +207,7 @@ class MainActivity : ComponentActivity() {
                                                 }
                                                 Icon(painter = painterResource(item.icon),
                                                     contentDescription = null,
-                                                    tint = if(selected) Orange else Color.Gray,
+                                                    tint = if(selected) Primary else Color.Gray,
                                                     modifier = Modifier.align(Alignment.Center))
                                             }
                                         }

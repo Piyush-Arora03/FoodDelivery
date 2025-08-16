@@ -70,7 +70,7 @@ import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.ui.theme.Mustard
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
                                                 }
                                                 Icon(painter = painterResource(item.icon),
                                                     contentDescription = null,
-                                                    tint = if(selected) Orange else Color.Gray,
+                                                    tint = if(selected) Primary else Color.Gray,
                                                     modifier = Modifier.align(Alignment.Center))
                                             }
                                         }
@@ -215,7 +215,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<HomeScreen> {
                                 showBottomNavSheet.value=true
-                                RiderHomeScreen(navController=navController, animatedVisibilityScope = this)
+                                RestaurantHomeScreen(navController=navController, animatedVisibilityScope = this)
                             }
                             composable<LogInScreen> {
                                 showBottomNavSheet.value=false
@@ -249,7 +249,7 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun RiderHomeScreen(
+fun RestaurantHomeScreen(
     navController: NavHostController,
     animatedVisibilityScope: AnimatedContentScope
 ) {

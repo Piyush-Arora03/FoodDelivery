@@ -57,7 +57,7 @@ import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.ui.FoodHubTextFiled
 import com.example.fooddelivery.ui.GroupSocialButtons
 import com.example.fooddelivery.ui.BasicDialog
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -183,7 +183,7 @@ fun SignUpScreen (viewModel: SignUpViewModel= hiltViewModel(),navController: Nav
             Spacer(modifier =Modifier.padding(bottom = 50.dp))
             Button(onClick = {
                 viewModel.onSignUpClick()
-            }, colors = ButtonDefaults.buttonColors(Orange),
+            }, colors = ButtonDefaults.buttonColors(Primary),
                 modifier = Modifier
                     .fillMaxWidth(0.6f)) {
                 Box(){

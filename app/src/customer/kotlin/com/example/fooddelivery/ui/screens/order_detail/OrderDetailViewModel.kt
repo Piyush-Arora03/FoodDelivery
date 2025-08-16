@@ -1,84 +1,84 @@
 package com.example.fooddelivery.ui.screens.order_detail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.Navigation
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.remote.ApiResponses
 import com.example.fooddelivery.data.remote.SafeApiCalls
+import com.example.fooddelivery.utils.UiState
+import com.example.fooddelivery.utils.handleException
+import com.example.fooddelivery.utils.toError
+import com.example.fooddelivery.utils.toLoading
+import com.example.fooddelivery.utils.toSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
+import javax.inject.Inject
+
 @HiltViewModel
-class OrderDetailViewModel @Inject constructor (val foodApi: FoodApi): ViewModel() {
+class OrderDetailViewModel @Inject constructor(
+    private val foodApi: FoodApi,
+) : ViewModel() {
 
-    val _uiState= MutableStateFlow<UiState>(UiState.Nothing)
-    val uiState=_uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UiState<Order>>(UiState.Loading)
+    val uiState = _uiState.asStateFlow()
 
-    val _navigationEvent= MutableSharedFlow<OrderDetailNavigationEvent>()
+    private val _navigationEvent= MutableSharedFlow<OrderDetailNavigationEvent>()
     val navigationEvent=_navigationEvent.asSharedFlow()
 
     var errMsg=""
 
-    fun getOrderDetail(orderId:String){
-        _uiState.value=UiState.Loading
+    fun getOrderDetails(orderId: String) {
         viewModelScope.launch {
-            SafeApiCalls { foodApi.getOrdersDetails(orderId)}.let {
-                when(it){
-                    is ApiResponses.Success -> _uiState.value=UiState.OrderDetail(it.data)
-                    is ApiResponses.Error -> {
-                        errMsg=it.msg
-                        _uiState.value=UiState.Error(errMsg)
-                    }
-                    is ApiResponses.Exception -> {
-                        handleException(it.exception)
-                    }
+            _uiState.toLoading()
+            when (val response = SafeApiCalls { foodApi.getOrdersDetails(orderId) }) {
+                is ApiResponses.Success -> {
+                    _uiState.toSuccess(response.data)
+                }
+
+                is ApiResponses.Error -> {
+                    _uiState.toError(response.msg)
+                }
+
+                is ApiResponses.Exception -> {
+                    handleException(response.exception, _uiState)
                 }
             }
         }
     }
 
-    private fun handleException(exception: Throwable) {
-        when (exception) {
-            is HttpException -> {
-                _uiState.value = UiState.Error("HTTP Error: ${exception.code()}")
-                errMsg = "Error"
-            }
-
-            is IOException -> {
-                _uiState.value =
-                    UiState.Error("Network Error: Please check your internet connection")
-                errMsg = "Error"
-            }
-
-            else -> {
-                _uiState.value = UiState.Error("Something went wrong")
-                errMsg = "Error"
-            }
-        }
-    }
-
-    fun resetUi(orderId:String){
+    fun navigateBack(){
         viewModelScope.launch {
-            getOrderDetail(orderId)
+            _navigationEvent.emit(OrderDetailNavigationEvent.NavigateBack)
         }
     }
 
-    sealed class OrderDetailNavigationEvent{
-        object NavigateBack:OrderDetailNavigationEvent()
-        data class NavigateToOrderDetails(val order:Order):OrderDetailNavigationEvent()
-        object ShowErrorDialog:OrderDetailNavigationEvent()
-    }
-    sealed class UiState{
-        object Loading:UiState()
-        data class Error(val errMsg:String):UiState()
-        data class OrderDetail(val orderDetail:Order):UiState()
-        object Nothing:UiState()
+//    fun cancelOrder(orderId: String) {
+//        viewModelScope.launch {
+//            when (val response = SafeApiCalls { foodApi.cancelOrder(orderId) }) {
+//                is ApiResponses.Success -> {
+//                    getOrderDetails(orderId)
+//                }
+//
+//                is ApiResponses.Error -> {
+//                    errMsg = response.msg
+//                }
+//
+//                is ApiResponses.Exception -> {
+//                    handleException(response.e, _uiState)
+//                }
+//            }
+//        }
+//    }
+
+    sealed class OrderDetailNavigationEvent(){
+        object NavigateBack: OrderDetailNavigationEvent()
     }
 }
