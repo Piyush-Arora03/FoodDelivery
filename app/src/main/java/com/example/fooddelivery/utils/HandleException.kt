@@ -1,5 +1,6 @@
 package com.example.fooddelivery.utils
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.HttpException
 import java.io.IOException

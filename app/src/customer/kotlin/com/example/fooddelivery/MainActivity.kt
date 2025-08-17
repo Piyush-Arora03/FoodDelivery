@@ -1,6 +1,7 @@
 package com.example.fooddelivery
 
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
@@ -69,6 +71,7 @@ import com.example.fooddelivery.navigation.OrdersListScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.navigation.foodItemNavType
+import com.example.fooddelivery.notification.MessagingService
 import com.example.fooddelivery.ui.screens.add_address.AddAddress
 import com.example.fooddelivery.ui.screens.address_list.AddressList
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
@@ -78,6 +81,7 @@ import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
 import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.home.HomeViewModel
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
 import com.example.fooddelivery.ui.screens.order_detail.OrderDetail
@@ -110,22 +114,23 @@ class MainActivity : ComponentActivity() {
         object Notification:BottomNavItems(NotificationScreen,R.drawable.nav_notification)
         object Orders:BottomNavItems(OrdersListScreen,R.drawable.ic_order)
     }
+    val viewModel by viewModels<HomeViewModel>()
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         var showSplashScreen=true
-        val fromNotification = intent.getBooleanExtra("from_notification", false)
-
         installSplashScreen().apply {
             setKeepOnScreenCondition(){
                 showSplashScreen
             }
-            if (fromNotification) {
-                setKeepOnScreenCondition { false }
-            } else {
                 setOnExitAnimationListener { screen ->
+                    val icon = screen.iconView
+                    if (icon == null) {
+                        screen.remove()
+                        return@setOnExitAnimationListener
+                    }
                     val zoomX = ObjectAnimator.ofFloat(
                         screen.iconView, View.SCALE_X, 0.5f, 0.0f
                     )
@@ -144,7 +149,6 @@ class MainActivity : ComponentActivity() {
                     }
                     zoomX.start()
                     zoomY.start()
-                }
             }
         }
         setContent {
@@ -306,12 +310,27 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        processIntent(intent,viewModel)
         if(::foodApi.isInitialized){
             Log.d(TAG,"FoodApi is initialized")
         }
         CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             showSplashScreen=false
+        }
+    }
+    override fun onNewIntent(intent: Intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            super.onNewIntent(intent)
+        }
+        processIntent(intent,viewModel)
+    }
+
+    fun processIntent(intent: Intent,viewModel: HomeViewModel){
+        if(intent.hasExtra(MessagingService.OrderId)){
+            val orderId=intent.getStringExtra(MessagingService.OrderId)
+            viewModel.navigateToOrderDetail(orderId!!)
+            intent.removeExtra(MessagingService.OrderId)
         }
     }
 }

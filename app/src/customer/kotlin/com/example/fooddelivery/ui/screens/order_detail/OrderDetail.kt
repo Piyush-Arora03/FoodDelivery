@@ -1,6 +1,7 @@
 package com.example.fooddelivery.ui.screens.order_detail
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import com.example.fooddelivery.data.modle.OrderItem
 import com.example.fooddelivery.ui.screens.orders.OrdersListViewModel
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.utils.UiState
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun OrderDetail(
@@ -51,13 +53,19 @@ fun OrderDetail(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     Log.d("OrderDetail",uiState.toString())
     LaunchedEffect(Unit) {
-        viewModel.navigationEvent.let {
+        viewModel.navigationEvent.collectLatest {
             when(it){
+                OrderDetailViewModel.OrderDetailNavigationEvent.NavigateBack -> {
+                    navController.popBackStack()
+                }
             }
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.getOrderDetails(orderId)
+    }
     Column(modifier = Modifier.fillMaxSize()) {
-        OrderDetailHeaderView(onBack = { navController.popBackStack() })
+        OrderDetailHeaderView(onBack = { viewModel.navigateBack() })
 
         when (uiState) {
             is UiState.Loading -> {
@@ -79,7 +87,7 @@ fun OrderDetail(
                 )
             }
             is UiState.Empty -> {
-
+                Toast.makeText(navController.context,"Empty",Toast.LENGTH_SHORT).show()
             }
         }
     }

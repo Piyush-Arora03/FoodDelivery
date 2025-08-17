@@ -47,6 +47,7 @@ import coil.compose.AsyncImage
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Category
 import com.example.fooddelivery.data.modle.Restaurant
+import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.navigation.RestaurantDetailScreen
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
@@ -65,6 +66,10 @@ fun SharedTransitionScope.HomeScreen(navController: NavController,viewModel: Hom
                 when(it){
                     is HomeViewModel.HomeScreenNavigationEvent.NavigateToDetail->{
                         navController.navigate(RestaurantDetailScreen(it.name,it.imageUrl,it.id))
+                    }
+
+                    is HomeViewModel.HomeScreenNavigationEvent.NavigateToOrderDetail -> {
+                        navController.navigate(OrderDetailScreen(it.orderId))
                     }
                 }
             }

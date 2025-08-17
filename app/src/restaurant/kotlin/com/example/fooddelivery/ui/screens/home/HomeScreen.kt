@@ -3,6 +3,8 @@ package com.example.fooddelivery.ui.screens.home
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -11,6 +13,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fooddelivery.navigation.OrderDetailScreen
+import com.example.fooddelivery.navigation.RestaurantMenuItem
+import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.Loading
 import kotlinx.coroutines.flow.collectLatest
@@ -48,10 +52,17 @@ fun HomeScreen(navController: NavController,homeViewModel: HomeViewModel= hiltVi
                 Loading()
             }
             is HomeViewModel.UiState.Error -> {
-                Log.d(TAG,uiState.msg)
+                Error(
+                    {homeViewModel.resetUi()},
+                    "An Error Occurred",
+                    "Please try again"
+                )
             }
             is HomeViewModel.UiState.Success -> {
                 Log.d(TAG,uiState.restaurant.toString())
+                Button({navController.navigate(RestaurantMenuItem(uiState.restaurant.id))}) {
+                    Text(text = "Menu")
+                }
             }
         }
     }

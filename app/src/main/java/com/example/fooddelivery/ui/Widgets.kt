@@ -30,16 +30,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +68,7 @@ import com.example.fooddelivery.R
 import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -346,10 +351,34 @@ fun Loading(){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Error(onClick: () -> Unit,msg:String,dis:String){
+    val coroutineScope= rememberCoroutineScope()
+    val sheetState= rememberModalBottomSheetState()
+    ModalBottomSheet(onDismissRequest = { onClick() }, sheetState = sheetState) {
+        BasicDialog(
+            msg = msg, dis = dis, onClick =
+                {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        onClick()
+                    }
+                })
+    }
+}
 
-
-
-
-
-
-
+@Composable
+fun EmptyState(message: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = message, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.padding(16.dp))
+        Button(onClick = onRetry) {
+            Text(text = "Go Back")
+        }
+    }
+}

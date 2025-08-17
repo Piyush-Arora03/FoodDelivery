@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.fooddelivery.ui.EmptyState
+import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.Loading
 import com.example.fooddelivery.utils.UiState
 import kotlinx.coroutines.flow.collectLatest
@@ -48,8 +50,18 @@ fun RestaurantOrderDetailScreen(
         }
         val uiState=viewModel.uiState.collectAsStateWithLifecycle()
         when(uiState.value){
-            is UiState.Empty -> TODO()
-            is UiState.Error -> TODO()
+            is UiState.Empty -> {
+                EmptyState(message = "No order details found") {
+                    navController.popBackStack()
+                }
+            }
+            is UiState.Error -> {
+                Error(
+                    {viewModel.resetUi(orderId)},
+                    "An Error Occurred",
+                    "Please try again"
+                )
+            }
             is UiState.Loading -> {
                 Loading()
             }

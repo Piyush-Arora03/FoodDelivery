@@ -85,6 +85,7 @@ class NotificationManager @Inject constructor(val foodApi: FoodApi,@ApplicationC
             .setContentTitle(title)
             .setSmallIcon(R.drawable.ic_dialog_info)
             .setContentIntent(intent)
+            .setAutoCancel(true)
             .setPriority(notificationType.importance)
             .build()
 

@@ -48,3 +48,6 @@ object RestaurantOrdersScreen: NavRoutes
 
 @Serializable
 object RestaurantNotificationScreen: NavRoutes
+
+@Serializable
+data class RestaurantMenuItem(val restaurantId: String): NavRoutes

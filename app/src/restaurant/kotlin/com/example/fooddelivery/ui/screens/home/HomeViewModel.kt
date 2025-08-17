@@ -7,6 +7,7 @@ import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.data.remote.ApiResponses
 import com.example.fooddelivery.data.remote.SafeApiCalls
+import com.example.fooddelivery.utils.handleException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,7 @@ class HomeViewModel @Inject constructor(val foodApi: FoodApi): ViewModel() {
                         _uiState.value=UiState.Error(it.msg)
                     }
                     is ApiResponses.Exception -> {
-
+                        _uiState.value=UiState.Error(it.exception.toString())
                     }
                     is ApiResponses.Success -> {
                         _uiState.value=UiState.Success(it.data)
@@ -42,6 +43,10 @@ class HomeViewModel @Inject constructor(val foodApi: FoodApi): ViewModel() {
                 }
             }
         }
+    }
+
+    fun resetUi(){
+        getRestaurant()
     }
 
     sealed class UiState(){

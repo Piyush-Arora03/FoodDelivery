@@ -6,11 +6,13 @@ import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.remote.ApiResponses
 import com.example.fooddelivery.data.remote.SafeApiCalls
+import com.example.fooddelivery.notification.NotificationEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -28,6 +30,11 @@ class OrdersListViewModel @Inject constructor(val foodApi: FoodApi):ViewModel() 
 
     init {
         getOrderList()
+        viewModelScope.launch {
+            NotificationEvent.events.collectLatest {
+                getOrderList()
+            }
+        }
     }
 
     fun getOrderList() {

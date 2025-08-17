@@ -13,7 +13,6 @@ import com.example.fooddelivery.utils.UiState
 import com.example.fooddelivery.utils.handleException
 import com.example.fooddelivery.utils.toError
 import com.example.fooddelivery.utils.toLoading
-import com.example.fooddelivery.utils.toResetUi
 import com.example.fooddelivery.utils.toSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

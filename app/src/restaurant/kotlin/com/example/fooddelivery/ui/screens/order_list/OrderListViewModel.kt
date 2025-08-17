@@ -12,6 +12,7 @@ import com.example.fooddelivery.data.remote.SafeApiCalls
 import com.example.fooddelivery.utils.OrderStatusUtils
 import com.example.fooddelivery.utils.UiState
 import com.example.fooddelivery.utils.handleException
+import com.example.fooddelivery.utils.toEmpty
 import com.example.fooddelivery.utils.toError
 import com.example.fooddelivery.utils.toSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +57,14 @@ class OrderListViewModel @Inject constructor(val foodApi: FoodApi): ViewModel(){
                 }
             }
         }
+    }
+
+    fun resetUi(status: String){
+        getRestaurantOrderDetails(status)
+    }
+
+    fun emptyState(){
+        _uiState.toEmpty()
     }
 
 }

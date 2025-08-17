@@ -48,6 +48,7 @@ class OrderDetailViewModel @Inject constructor(
                 }
 
                 is ApiResponses.Exception -> {
+                    _uiState.toError("Unknown Error")
                     handleException(response.exception, _uiState)
                 }
             }

@@ -54,6 +54,7 @@ import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
 import com.example.fooddelivery.navigation.OrderDetailScreen
+import com.example.fooddelivery.navigation.RestaurantMenuItem
 import com.example.fooddelivery.navigation.RestaurantNotificationScreen
 import com.example.fooddelivery.navigation.RestaurantOrdersScreen
 import com.example.fooddelivery.navigation.SignUpScreen
@@ -64,6 +65,8 @@ import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.home.HomeViewModel
+import com.example.fooddelivery.ui.screens.menu.list.MenuListItem
+import com.example.fooddelivery.ui.screens.menu.list.MenuListScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.order_detail.RestaurantOrderDetailScreen
 import com.example.fooddelivery.ui.screens.order_list.OrderListScreen
@@ -101,6 +104,11 @@ class MainActivity : ComponentActivity() {
                 showSplashScreen
             }
             setOnExitAnimationListener{ screen->
+                val icon = screen.iconView
+                if (icon == null) {
+                    screen.remove()
+                    return@setOnExitAnimationListener
+                }
                 val zoomX = ObjectAnimator.ofFloat(
                     screen.iconView, View.SCALE_X,0.5f,0.0f
                 )
@@ -213,18 +221,23 @@ class MainActivity : ComponentActivity() {
                                 val orderId=it.toRoute<OrderDetailScreen>()
                                 RestaurantOrderDetailScreen(orderId.orderId,navController)
                             }
+                            composable<RestaurantMenuItem> {
+                                showBottomNavSheet.value=false
+                                val restaurantId=it.toRoute<RestaurantMenuItem>()
+                                MenuListScreen(restaurantId.restaurantId,navController)
+                            }
                         }
                     }
                 }
             }
         }
+        processIntent(intent,viewModel)
         if(::foodApi.isInitialized){
             Log.d(TAG,"FoodApi is initialized")
         }
         CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             showSplashScreen=false
-            processIntent(intent,viewModel)
         }
     }
 

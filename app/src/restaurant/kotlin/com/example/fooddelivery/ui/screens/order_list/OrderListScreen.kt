@@ -24,7 +24,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.navigation.OrderDetailScreen
+import com.example.fooddelivery.ui.EmptyState
+import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.HeaderView
+import com.example.fooddelivery.ui.Loading
 import com.example.fooddelivery.utils.UiState
 import kotlinx.coroutines.launch
 
@@ -61,20 +64,29 @@ fun  OrderListScreen(navController: NavController, viewModel: OrderListViewModel
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = type[page], modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
-                LazyColumn {
                     when(uiState){
                         is UiState.Empty -> {
-
+                            EmptyState("No Order List Found") {
+                                navController.popBackStack()
+                            }
                         }
                         is UiState.Error -> {
-
+                            Error(
+                                {viewModel.resetUi(type[pagerState.currentPage])},
+                                "An Error Occurred",
+                                "Please try again"
+                            )
                         }
                         is UiState.Loading -> {
-
+                            Loading()
                         }
                         is UiState.Success<*> -> {
                             val orderDetailState = (uiState as UiState.Success<*>).data as OrderListViewModel.OrderDetailState
                             val orderList = orderDetailState.orders?.orders ?: emptyList()
+                            if(orderList.isEmpty()){
+                                viewModel.emptyState()
+                            }
+                            LazyColumn {
                             items(
                                 count = orderList.size,
                                 key = { index -> orderList[index].id }

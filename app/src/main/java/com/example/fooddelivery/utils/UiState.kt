@@ -21,6 +21,6 @@ fun <T> MutableStateFlow<UiState<T>>.toLoading() {
     value = UiState.Loading
 }
 
-fun <T> MutableStateFlow<UiState<T>>.toResetUi() {
+fun <T> MutableStateFlow<UiState<T>>.toEmpty() {
         value = UiState.Empty
 }
