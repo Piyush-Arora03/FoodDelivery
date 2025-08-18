@@ -23,11 +23,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideClient(session: FoodHubAuthSession): OkHttpClient {
+    fun provideClient(session: FoodHubAuthSession,@ApplicationContext context:Context): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("Authorization", "Bearer ${session.getToken()}")
+                    .addHeader("X-Package-Name",context.packageName)
                     .build()
                 chain.proceed(request)
             }

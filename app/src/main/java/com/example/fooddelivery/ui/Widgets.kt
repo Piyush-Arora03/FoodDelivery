@@ -3,32 +3,47 @@ package com.example.fooddelivery.ui
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,10 +59,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
 import com.example.fooddelivery.R
 import com.example.fooddelivery.ui.screens.auth.BaseAuthProviderViewModel
-import com.example.fooddelivery.ui.theme.Orange
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @Composable
 fun SocialButtons(
@@ -135,7 +158,7 @@ fun FoodHubTextFiled(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = RoundedCornerShape(10.dp),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors().copy(
-        focusedIndicatorColor= Orange,
+        focusedIndicatorColor= Primary,
         unfocusedIndicatorColor = Color.Gray.copy(alpha = 0.4f)
     )
 ){
@@ -223,10 +246,139 @@ fun BasicDialog(
         Button(
             onClick = onClick,
             modifier = Modifier.clip(RoundedCornerShape(16.dp)),
-            colors = ButtonDefaults.buttonColors(Orange)
+            colors = ButtonDefaults.buttonColors(Primary)
         ) {
             Text(text = "OK", modifier = Modifier.padding(4.dp))
         }
         Spacer(modifier = Modifier.padding(vertical = 8.dp))
+    }
+}
+
+@Composable
+fun CustomNavHost(
+    navController: NavHostController,
+    startDestination: Any,
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopStart,
+    route: KClass<*>?= null,
+    typeMap: Map<KType, @JvmSuppressWildcards() NavType<*>> = emptyMap(),
+    enterTransition:
+    (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700),
+            )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+        },
+    exitTransition:
+    (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700),
+            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+        },
+    popEnterTransition:
+    (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) ={
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+            animationSpec = tween(700),
+        )+ fadeIn(animationSpec = tween(700), initialAlpha = 0.2f)
+    },
+    popExitTransition:
+    (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700),
+            )+ fadeOut(animationSpec = tween(700), targetAlpha = 1f)
+        },
+    sizeTransform:
+    (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)? =
+        null,
+    builder: NavGraphBuilder.() -> Unit
+){
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier,
+        contentAlignment = contentAlignment,
+        route = route,
+        typeMap = typeMap,
+        enterTransition = enterTransition,
+        exitTransition = exitTransition,
+        popEnterTransition = popEnterTransition,
+        popExitTransition = popExitTransition,
+        builder = builder,
+        sizeTransform = sizeTransform
+    )
+}
+
+@Composable
+fun HeaderView(onBack: () -> Unit,name:String) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        IconButton(
+            onClick = { onBack() },
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterStart)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.back_button),
+                contentDescription = "Back",
+                modifier = Modifier.size(60.dp)
+            )
+        }
+        Text(
+            text = name,
+            modifier = Modifier.align(Alignment.Center),
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
+}
+
+@Composable
+fun Loading(){
+    Box(modifier = Modifier.fillMaxSize()){
+        CircularProgressIndicator(modifier = Modifier.align(
+            alignment = Alignment.Center
+        ))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Error(onClick: () -> Unit,msg:String,dis:String){
+    val coroutineScope= rememberCoroutineScope()
+    val sheetState= rememberModalBottomSheetState()
+    ModalBottomSheet(onDismissRequest = { onClick() }, sheetState = sheetState) {
+        BasicDialog(
+            msg = msg, dis = dis, onClick =
+                {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        onClick()
+                    }
+                })
+    }
+}
+
+@Composable
+fun EmptyState(message: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = message, style = MaterialTheme.typography.bodyMedium)
+        Spacer(modifier = Modifier.padding(16.dp))
+        Button(onClick = onRetry) {
+            Text(text = "Go Back")
+        }
     }
 }

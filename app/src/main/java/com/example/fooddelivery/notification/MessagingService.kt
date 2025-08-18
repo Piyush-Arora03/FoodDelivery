@@ -2,7 +2,6 @@ package com.example.fooddelivery.notification
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.example.fooddelivery.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -28,6 +27,7 @@ class MessagingService @Inject constructor() : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         job.launch {
+            Log.d("NotificationEvent","emitting notification event...")
             NotificationEvent.emit()
         }
         val intent = Intent(this, MainActivity::class.java)
@@ -40,7 +40,7 @@ class MessagingService @Inject constructor() : FirebaseMessagingService() {
             val orderId = data[OrderId] ?: ""
             intent.putExtra(OrderId, orderId)
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val notificationType = when (type) {
             "order" -> NotificationManager.NotificationType.ORDER
             "general" -> NotificationManager.NotificationType.PROMOTION
@@ -50,6 +50,7 @@ class MessagingService @Inject constructor() : FirebaseMessagingService() {
         val notificationIdInt = notificationId?.toIntOrNull() ?: notificationId?.hashCode() ?: System.currentTimeMillis().toInt()
         notificationManager.showNotification(title, body, notificationType, pendingIntent, notificationIdInt)
     }
+
 
     companion object {
         const val OrderId = "orderId"

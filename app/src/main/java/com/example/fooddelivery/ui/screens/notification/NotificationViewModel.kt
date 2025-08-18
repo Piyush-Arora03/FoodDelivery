@@ -25,8 +25,6 @@ import java.time.format.DateTimeParseException
 import java.util.Locale
 import javax.inject.Inject
 
-// Sealed class to represent the different UI states
-
 @HiltViewModel
 class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : ViewModel() {
 
@@ -72,11 +70,11 @@ class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : 
                             _uiState.value = NotificationUiState.Success(grouped)
                         }
                     } else {
-                        _uiState.value = NotificationUiState.Empty // Or an error state
+                        _uiState.value = NotificationUiState.Empty
                     }
                 }
                 is ApiResponses.Error -> {
-                    _uiState.value = NotificationUiState.Empty // Or an error state
+                    _uiState.value = NotificationUiState.Empty
                 }
                 is ApiResponses.Exception -> {
 
@@ -128,7 +126,6 @@ class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : 
 
     fun navigateToOrderDetail(notification: Notification) {
         viewModelScope.launch {
-            if(!notification.isRead){
                 val response = SafeApiCalls {
                     foodApi.readNotification(notification.id)
                 }
@@ -140,7 +137,6 @@ class NotificationViewModel @Inject constructor(private val foodApi: FoodApi) : 
                     is ApiResponses.Error<*> -> TODO()
                     is ApiResponses.Exception<*> -> TODO()
                 }
-            }
         }
     }
 

@@ -10,6 +10,7 @@ import com.example.fooddelivery.data.modle.CategoriesResponse
 import com.example.fooddelivery.data.modle.ConfirmPaymentRequest
 import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
 import com.example.fooddelivery.data.modle.FCMTokenRequest
+import com.example.fooddelivery.data.modle.FoodItemListResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
 import com.example.fooddelivery.data.modle.Notification
@@ -102,4 +103,17 @@ interface FoodApi {
 
     @POST("/notifications/{id}/read")
     suspend fun readNotification(@Path("id") id:String):Response<GenericMsgResponse>
+
+    @GET("/restaurant-owner/profile")
+    suspend fun getRestaurantProfile() : Response<Restaurant>
+
+    @GET("/restaurant-owner/orders")
+    suspend fun getRestaurantOrderDetails(@Query("status") status:String): Response<OrderListResponse>
+
+    @PATCH("orders/{orderId}/status")
+    suspend fun updateOrderStatus(@Path("orderId")orderId: String,@Body map:Map<String,String>): Response<GenericMsgResponse>
+
+    @GET("/restaurants/e7d1510a-a090-47bf-b8ab-0a4f75f05b07/menu")
+    suspend fun getRestaurantMenu() : Response<FoodItemListResponse>
 }
+//@Path("id")id:String
