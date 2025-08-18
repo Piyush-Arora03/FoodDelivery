@@ -10,9 +10,11 @@ import com.example.fooddelivery.data.modle.CategoriesResponse
 import com.example.fooddelivery.data.modle.ConfirmPaymentRequest
 import com.example.fooddelivery.data.modle.ConfirmPaymentResponse
 import com.example.fooddelivery.data.modle.FCMTokenRequest
+import com.example.fooddelivery.data.modle.FoodItem
 import com.example.fooddelivery.data.modle.FoodItemListResponse
 import com.example.fooddelivery.data.modle.FoodItemResponse
 import com.example.fooddelivery.data.modle.GenericMsgResponse
+import com.example.fooddelivery.data.modle.ImageUploadResponse
 import com.example.fooddelivery.data.modle.Notification
 import com.example.fooddelivery.data.modle.NotificationResponse
 import com.example.fooddelivery.data.modle.OAuthRequest
@@ -26,13 +28,16 @@ import com.example.fooddelivery.data.modle.ReverseGeocodeRequest
 import com.example.fooddelivery.data.modle.SignInRequest
 import com.example.fooddelivery.data.modle.SignUpRequest
 import com.example.fooddelivery.data.modle.UpdateCartItemRequest
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -113,7 +118,13 @@ interface FoodApi {
     @PATCH("orders/{orderId}/status")
     suspend fun updateOrderStatus(@Path("orderId")orderId: String,@Body map:Map<String,String>): Response<GenericMsgResponse>
 
-    @GET("/restaurants/e7d1510a-a090-47bf-b8ab-0a4f75f05b07/menu")
-    suspend fun getRestaurantMenu() : Response<FoodItemListResponse>
+    @GET("/restaurants/{id}/menu")
+    suspend fun getRestaurantMenu(@Path("id")id:String) : Response<FoodItemListResponse>
+
+    @POST("/restaurants/{id}/menu")
+    suspend fun addRestaurantMenu(@Path("id")id:String,@Body foodItem: FoodItem) : Response<GenericMsgResponse>
+
+    @POST("images/upload")
+    @Multipart
+    suspend fun uploadImage(@Part image: MultipartBody.Part) : Response<ImageUploadResponse>
 }
-//@Path("id")id:String

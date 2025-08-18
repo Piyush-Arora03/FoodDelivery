@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,9 +31,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +75,9 @@ import com.example.fooddelivery.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 
 @Composable
 fun SocialButtons(
@@ -133,75 +140,121 @@ fun GroupSocialButtons(
     }
 }
 
+//@Composable
+//fun FoodHubTextFiled(
+//    value: String,
+//    onValueChange: (String) -> Unit,
+//    modifier: Modifier = Modifier,
+//    enabled: Boolean = true,
+//    readOnly: Boolean = false,
+//    textStyle: TextStyle = LocalTextStyle.current,
+//    label: @Composable (() -> Unit)? = null,
+//    placeholder: @Composable (() -> Unit)? = null,
+//    leadingIcon: @Composable (() -> Unit)? = null,
+//    trailingIcon: @Composable (() -> Unit)? = null,
+//    prefix: @Composable (() -> Unit)? = null,
+//    suffix: @Composable (() -> Unit)? = null,
+//    supportingText: @Composable (() -> Unit)? = null,
+//    isError: Boolean = false,
+//    visualTransformation: VisualTransformation = VisualTransformation.None,
+//    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+//    keyboardActions: KeyboardActions = KeyboardActions.Default,
+//    singleLine: Boolean = false,
+//    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+//    minLines: Int = 1,
+//    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+//    shape: Shape = RoundedCornerShape(10.dp),
+//    colors: TextFieldColors = OutlinedTextFieldDefaults.colors().copy(
+//        focusedIndicatorColor= Primary,
+//        unfocusedIndicatorColor = Color.Gray.copy(alpha = 0.4f)
+//    )
+//){
+//    Column(
+//        modifier=Modifier.padding(horizontal = 20.dp)
+//    ) {
+//        label?.let {
+//            Row() {
+//                it()
+//                Spacer(modifier=Modifier.padding(bottom = 30.dp))
+//            }
+//        }
+//        //Spacer(modifier=Modifier.padding(bottom=10.dp))
+//        OutlinedTextField(
+//                value=value,
+//                onValueChange = onValueChange,
+//                modifier = modifier,
+//                enabled = enabled,
+//                readOnly = readOnly,
+//                textStyle = textStyle.copy(
+//                    fontWeight = FontWeight.SemiBold,
+//                    fontSize = 16.sp,
+//                    fontFamily = poppinsFontFamily
+//                ),
+//                label = null,
+//                placeholder = placeholder,
+//                leadingIcon = leadingIcon,
+//                trailingIcon = trailingIcon,
+//                prefix = prefix,
+//                suffix = suffix,
+//                supportingText = supportingText,
+//                isError = isError,
+//                visualTransformation = visualTransformation,
+//                keyboardOptions = keyboardOptions,
+//                keyboardActions = keyboardActions,
+//                singleLine = singleLine,
+//                maxLines = maxLines,
+//                minLines = minLines,
+//                interactionSource = interactionSource,
+//                shape = shape,
+//                colors = colors
+//        )
+//    }
+//}
 @Composable
 fun FoodHubTextFiled(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    prefix: @Composable (() -> Unit)? = null,
-    suffix: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    minLines: Int = 1,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = RoundedCornerShape(10.dp),
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors().copy(
-        focusedIndicatorColor= Primary,
-        unfocusedIndicatorColor = Color.Gray.copy(alpha = 0.4f)
-    )
-){
-    Column(
-        modifier=Modifier.padding(horizontal = 20.dp)
-    ) {
-        label?.let {
-            Row() {
-                it()
-                Spacer(modifier=Modifier.padding(bottom = 30.dp))
-            }
-        }
-        //Spacer(modifier=Modifier.padding(bottom=10.dp))
-        OutlinedTextField(
-                value=value,
-                onValueChange = onValueChange,
-                modifier = modifier,
-                enabled = enabled,
-                readOnly = readOnly,
-                textStyle = textStyle.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    fontFamily = poppinsFontFamily
-                ),
-                label = null,
-                placeholder = placeholder,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                prefix = prefix,
-                suffix = suffix,
-                supportingText = supportingText,
-                isError = isError,
-                visualTransformation = visualTransformation,
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                singleLine = singleLine,
-                maxLines = maxLines,
-                minLines = minLines,
-                interactionSource = interactionSource,
-                shape = shape,
-                colors = colors
+    shape: Shape = RoundedCornerShape(12.dp),
+) {
+    // The outer Column is removed. The entire component is just the OutlinedTextField.
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = isError,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        shape = shape,
+        textStyle = TextStyle(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            fontFamily = poppinsFontFamily
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Primary,
+            unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
+            focusedLabelColor = Primary,
+            cursorColor = Primary
         )
-    }
+    )
 }
 
 @Composable
@@ -319,27 +372,32 @@ fun CustomNavHost(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeaderView(onBack: () -> Unit,name:String) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        IconButton(
-            onClick = { onBack() },
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.CenterStart)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.back_button),
-                contentDescription = "Back",
-                modifier = Modifier.size(60.dp)
+fun HeaderView(onBack: () -> Unit, name: String) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
             )
-        }
-        Text(
-            text = name,
-            modifier = Modifier.align(Alignment.Center),
-            style = MaterialTheme.typography.titleLarge
-        )
-    }
+        },
+        navigationIcon = {
+            IconButton(onClick = { onBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Primary,
+            titleContentColor = Color.White,
+            navigationIconContentColor = Color.White
+        ),
+        windowInsets = WindowInsets(0.dp)
+    )
 }
 
 @Composable
@@ -369,7 +427,7 @@ fun Error(onClick: () -> Unit,msg:String,dis:String){
 }
 
 @Composable
-fun EmptyState(message: String, onRetry: () -> Unit) {
+fun EmptyState(message: String,btnText:String, onRetry: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -378,7 +436,7 @@ fun EmptyState(message: String, onRetry: () -> Unit) {
         Text(text = message, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.padding(16.dp))
         Button(onClick = onRetry) {
-            Text(text = "Go Back")
+            Text(text = btnText)
         }
     }
 }

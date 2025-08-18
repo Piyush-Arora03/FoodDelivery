@@ -51,7 +51,11 @@ import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.Loading
+import com.example.fooddelivery.ui.theme.Green
 import com.example.fooddelivery.ui.theme.Primary
+import com.example.fooddelivery.ui.theme.Red
+import com.example.fooddelivery.ui.theme.VLGreen
+import com.example.fooddelivery.ui.theme.VLRed
 import com.example.fooddelivery.utils.StringUtils
 import com.example.fooddelivery.utils.UiState
 import kotlinx.coroutines.launch
@@ -66,7 +70,7 @@ fun  OrderListScreen(navController: NavController, viewModel: OrderListViewModel
     Column(modifier = Modifier.fillMaxSize()){
         HeaderView({
             navController.popBackStack()
-        },"Orders Detail")
+        },"Orders")
         val pagerState= rememberPagerState(){type.size}
         val coroutineScope= rememberCoroutineScope()
         ScrollableTabRow(
@@ -108,7 +112,7 @@ fun  OrderListScreen(navController: NavController, viewModel: OrderListViewModel
             Column(modifier = Modifier.weight(1f)) {
                     when(uiState){
                         is UiState.Empty -> {
-                            EmptyState("No Order List Found") {
+                            EmptyState("No Order List Found","Go Back") {
                                 navController.popBackStack()
                             }
                         }
@@ -212,9 +216,9 @@ fun OrderListItem(order: Order, onClick: () -> Unit) {
 @Composable
 fun OrderStatusChip(status: String) {
     val (bgColor, textColor) = when (status.uppercase()) {
-        "DELIVERED" -> Pair(Color(0xFFE8F5E9), Color(0xFF388E3C))
-        "CANCELLED", "REJECTED", "DELIVERY_FAILED" -> Pair(Color(0xFFFFEBEE), Color(0xFFD32F2F))
-        else -> Pair(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), Primary)
+        "DELIVERED" -> Pair(VLGreen, Green)
+        "CANCELLED", "REJECTED", "DELIVERY_FAILED" -> Pair(VLRed, Red)
+        else -> Pair(Primary.copy(alpha = 0.1f), Primary)
     }
 
     Box(

@@ -37,7 +37,7 @@ class MenuListViewModel @Inject constructor(val foodApi: FoodApi) : ViewModel(){
         _uiState.toLoading()
         viewModelScope.launch {
             SafeApiCalls {
-                foodApi.getRestaurantMenu()
+                foodApi.getRestaurantMenu(restaurantId)
             }.let {
                 when(it){
                     is ApiResponses.Error<*> -> {

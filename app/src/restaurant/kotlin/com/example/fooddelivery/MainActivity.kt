@@ -49,6 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
+import com.example.fooddelivery.navigation.AddMenu
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
@@ -65,6 +66,7 @@ import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.home.HomeViewModel
+import com.example.fooddelivery.ui.screens.menu.add.AddItemScreen
 import com.example.fooddelivery.ui.screens.menu.list.MenuListItem
 import com.example.fooddelivery.ui.screens.menu.list.MenuListScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
@@ -225,6 +227,10 @@ class MainActivity : ComponentActivity() {
                                 showBottomNavSheet.value=false
                                 val restaurantId=it.toRoute<RestaurantMenuItem>()
                                 MenuListScreen(restaurantId.restaurantId,navController)
+                            }
+                            composable<AddMenu> {
+                                showBottomNavSheet.value=false
+                                AddItemScreen(navController)
                             }
                         }
                     }

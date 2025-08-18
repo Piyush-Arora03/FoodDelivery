@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.data.modle.Notification
 import com.example.fooddelivery.navigation.OrderDetailScreen
+import com.example.fooddelivery.ui.HeaderView
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,9 +53,9 @@ fun NotificationScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NotificationHeaderView {
+        HeaderView({
             navController.popBackStack()
-        }
+        },"Notifications")
         when (val state = uiState) {
             is NotificationViewModel.NotificationUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

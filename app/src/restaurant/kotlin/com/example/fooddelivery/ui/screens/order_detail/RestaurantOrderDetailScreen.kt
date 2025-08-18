@@ -33,6 +33,7 @@ import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.modle.OrderItem
 import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.Error
+import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.Loading
 import com.example.fooddelivery.utils.UiState
 import kotlinx.coroutines.flow.collectLatest
@@ -62,10 +63,13 @@ fun RestaurantOrderDetailScreen(
                 }
             }
         }
+        HeaderView({
+            navController.popBackStack()
+        },"Order Details")
         val uiState=viewModel.uiState.collectAsStateWithLifecycle()
         when(uiState.value){
             is UiState.Empty -> {
-                EmptyState(message = "No order details found") {
+                EmptyState(message = "No order details found","Go Back") {
                     navController.popBackStack()
                 }
             }
