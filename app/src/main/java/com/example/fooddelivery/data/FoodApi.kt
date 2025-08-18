@@ -113,6 +113,7 @@ interface FoodApi {
     @PATCH("orders/{orderId}/status")
     suspend fun updateOrderStatus(@Path("orderId")orderId: String,@Body map:Map<String,String>): Response<GenericMsgResponse>
 
-    @GET("/restaurants/{id}/menu")
-    suspend fun getRestaurantMenu(@Path("id")id:String) : Response<FoodItemListResponse>
+    @GET("/restaurants/e7d1510a-a090-47bf-b8ab-0a4f75f05b07/menu")
+    suspend fun getRestaurantMenu() : Response<FoodItemListResponse>
 }
+//@Path("id")id:String
