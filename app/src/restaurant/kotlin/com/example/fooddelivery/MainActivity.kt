@@ -31,6 +31,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -54,6 +56,8 @@ import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
+import com.example.fooddelivery.navigation.NavigationEvent
+import com.example.fooddelivery.navigation.NavigationManager
 import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.navigation.RestaurantMenuItem
 import com.example.fooddelivery.navigation.RestaurantNotificationScreen
@@ -106,16 +110,16 @@ class MainActivity : ComponentActivity() {
                 showSplashScreen
             }
             setOnExitAnimationListener{ screen->
-                val icon = screen.iconView
-                if (icon == null) {
+                if (screen.iconView == null) {
                     screen.remove()
                     return@setOnExitAnimationListener
                 }
+                val icon = screen.iconView
                 val zoomX = ObjectAnimator.ofFloat(
-                    screen.iconView, View.SCALE_X,0.5f,0.0f
+                    icon, View.SCALE_X,0.5f,0.0f
                 )
                 val zoomY=ObjectAnimator.ofFloat(
-                    screen.iconView,View.SCALE_Y,0.5f,0.0f
+                    icon,View.SCALE_Y,0.5f,0.0f
                 )
                 zoomX.duration=1000
                 zoomY.duration=1000
@@ -141,6 +145,21 @@ class MainActivity : ComponentActivity() {
                     BottomNavItems.Orders,
                     BottomNavItems.Notifications)
                 val navController= rememberNavController()
+
+                LaunchedEffect(Unit) {
+                    NavigationManager.navigationEvent.collect { event ->
+                        when (event) {
+                            is NavigationEvent.NavigateToOrderDetail -> {
+                                navController.navigate(OrderDetailScreen(orderId = event.orderId))
+                                NavigationManager.clearEvent() // Reset the event
+                            }
+                            NavigationEvent.None -> {
+                                // Do nothing
+                            }
+                        }
+                    }
+                }
+
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val currRoute=navController.currentBackStackEntryAsState().value?.destination
@@ -152,7 +171,14 @@ class MainActivity : ComponentActivity() {
                                     val selected=currRoute?.hierarchy?.any { it.route==item.route::class.qualifiedName }==true
                                     NavigationBarItem(
                                         selected = false,
-                                        onClick = {  navController.navigate(item.route)},
+                                        onClick = { 
+                                            navController.navigate(item.route){
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }},
                                         icon = {
                                             Box(modifier = Modifier.size(48.dp)) {
                                                 Icon(painter = painterResource(item.icon),
@@ -237,10 +263,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        processIntent(intent,viewModel)
-        if(::foodApi.isInitialized){
-            Log.d(TAG,"FoodApi is initialized")
-        }
         CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             showSplashScreen=false
@@ -252,15 +274,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             super.onNewIntent(intent)
         }
-        processIntent(intent,viewModel)
-    }
-
-    fun processIntent(intent: Intent,viewModel: HomeViewModel){
-        if(intent.hasExtra(MessagingService.OrderId)){
-            val orderId=intent.getStringExtra(MessagingService.OrderId)
-            viewModel.navigateToOrderDetail(orderId!!)
-            intent.removeExtra(MessagingService.OrderId)
-        }
+        NavigationManager.processIntent(intent)
     }
 }
 
