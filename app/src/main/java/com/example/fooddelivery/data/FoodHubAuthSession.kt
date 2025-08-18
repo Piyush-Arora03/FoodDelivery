@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 class FoodHubAuthSession @Inject constructor(@ApplicationContext val context: Context) {
     val isLoggedIn= MutableStateFlow(false)
@@ -16,5 +17,13 @@ class FoodHubAuthSession @Inject constructor(@ApplicationContext val context: Co
     }
     fun getToken(): String? {
         return sharedPref.getString("token", null)
+    }
+
+    fun saveRestaurantId(id:String){
+        sharedPref.edit { putString("restaurantId", id) }
+    }
+
+    fun getRestaurantId() : String?{
+        return sharedPref.getString("restaurantId", null)
     }
 }

@@ -63,7 +63,7 @@ fun MenuListScreen(restaurantId:String,navController: NavController,viewModel: M
 
     when(uiState.value){
         is UiState.Empty -> {
-            EmptyState("No Menu Item To Show") {
+            EmptyState("No Menu Item To Show","Go Back") {
                 navController.popBackStack()
             }
         }
@@ -97,7 +97,7 @@ fun MenuListScreen(restaurantId:String,navController: NavController,viewModel: M
                 ) {
                     items(
                         count = list.size,
-                        key ={index -> list[index].id}
+                        key ={index -> list[index].id!!}
                     ){
                         MenuListItem(list[it], onClick = {})
                     }

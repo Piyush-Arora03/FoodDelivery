@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.fooddelivery.data.modle.Restaurant
+import com.example.fooddelivery.navigation.AddMenu
 import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.navigation.RestaurantMenuItem
 import com.example.fooddelivery.ui.Error
@@ -70,8 +71,7 @@ fun HomeScreen(navController: NavController,homeViewModel: HomeViewModel= hiltVi
 
     Column(modifier = Modifier
         .fillMaxSize()) {
-        HeaderView(
-            {
+        HeaderView({
                 navController.popBackStack()
             },
             name = "Home",
@@ -92,7 +92,9 @@ fun HomeScreen(navController: NavController,homeViewModel: HomeViewModel= hiltVi
                 Column {
                     RestaurantHeader(restaurant = uiState.restaurant)
                     Spacer(modifier = Modifier.padding(12.dp))
-                    MenuActionsSection({},{
+                    MenuActionsSection({
+                        navController.navigate(AddMenu)
+                    },{
                         navController.navigate(RestaurantMenuItem(uiState.restaurant.id))
                     })
                 }
