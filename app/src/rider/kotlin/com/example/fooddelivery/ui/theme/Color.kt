@@ -11,3 +11,11 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 val Primary = Color(0xFF2E7D32)
 val Mustard=Color(0xFFFFC529)
+
+val VLGreen=Color(0xFFE8F5E9)
+
+val Green=Color(0xFF388E3C)
+
+val VLRed=Color(0xFFFFEBEE)
+
+val Red=Color(0xFFD32F2F)

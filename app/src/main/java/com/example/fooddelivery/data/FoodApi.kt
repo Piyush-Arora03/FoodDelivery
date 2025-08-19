@@ -25,6 +25,7 @@ import com.example.fooddelivery.data.modle.PaymentIntentResponse
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.data.modle.RestaurantResponse
 import com.example.fooddelivery.data.modle.ReverseGeocodeRequest
+import com.example.fooddelivery.data.modle.RiderAvailableDeliveriesResponse
 import com.example.fooddelivery.data.modle.SignInRequest
 import com.example.fooddelivery.data.modle.SignUpRequest
 import com.example.fooddelivery.data.modle.UpdateCartItemRequest
@@ -127,4 +128,13 @@ interface FoodApi {
     @POST("images/upload")
     @Multipart
     suspend fun uploadImage(@Part image: MultipartBody.Part) : Response<ImageUploadResponse>
+
+    @GET("/rider/deliveries/available")
+    suspend fun getAvailableDeliveries(): Response<RiderAvailableDeliveriesResponse>
+
+    @POST("/rider/deliveries/{orderId}/accept")
+    suspend fun onDeliveryAccept(@Path("orderId")id:String):Response<GenericMsgResponse>
+
+    @POST("/rider/deliveries/{orderId}/reject")
+    suspend fun onDeliveryReject(@Path("orderId")id:String):Response<GenericMsgResponse>
 }

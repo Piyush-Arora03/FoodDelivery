@@ -35,7 +35,7 @@ object NetworkModule {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
-            .build() // return the built OkHttpClient, not the Builder
+            .build()
     }
     @Provides
     fun provideRetrofitClient(client: OkHttpClient):Retrofit{

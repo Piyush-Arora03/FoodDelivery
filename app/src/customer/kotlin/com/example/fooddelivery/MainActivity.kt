@@ -21,6 +21,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -52,6 +53,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
@@ -127,11 +129,6 @@ class MainActivity : ComponentActivity() {
                 showSplashScreen
             }
                 setOnExitAnimationListener { screen ->
-                    val icon = screen.iconView
-                    if (icon == null) {
-                        screen.remove()
-                        return@setOnExitAnimationListener
-                    }
                     val zoomX = ObjectAnimator.ofFloat(
                         screen.iconView, View.SCALE_X, 0.5f, 0.0f
                     )

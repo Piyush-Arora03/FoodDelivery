@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,12 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -35,17 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.fooddelivery.R
@@ -55,8 +47,9 @@ import com.example.fooddelivery.data.modle.CheckoutDetails
 import com.example.fooddelivery.navigation.AddressListScreen
 import com.example.fooddelivery.navigation.OrderSuccessScreen
 import com.example.fooddelivery.ui.BasicDialog
+import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.HeaderView
-import com.example.fooddelivery.ui.screens.food_detail.FoodDetailViewModel
+import com.example.fooddelivery.ui.Loading
 import com.example.fooddelivery.ui.screens.food_detail.ItemCounter
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
@@ -108,14 +101,14 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                     PaymentConfiguration.init(navController.context,it.data.publishableKey)
                     val customer=PaymentSheet.CustomerConfiguration(it.data.customerId,
                     it.data.ephemeralKeySecret)
-                    val paymentSHeetConfiguration=PaymentSheet.Configuration(
+                    val paymentSheetConfiguration=PaymentSheet.Configuration(
                         merchantDisplayName = "Food Hub",
                         customer = customer,
                         allowsDelayedPaymentMethods = false
                     )
                     paymentSheet.presentWithPaymentIntent(
                         it.data.paymentIntentClientSecret,
-                        paymentSHeetConfiguration)
+                        paymentSheetConfiguration)
                 }
                 is CartViewModel.CartEvent.OnPaymentSuccess -> {
                     viewModel.getCart()
@@ -137,9 +130,9 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
                     }
                     item {
                         if(data.items.isEmpty()){
-                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                                 Text(text = "Cart is empty")
-                             }
+                            EmptyState("Your Cart Is Empty","Go Add Something") {
+                                navController.popBackStack()
+                            }
                         }
                         else{
                             val selectedAddress=viewModel.address.collectAsStateWithLifecycle()
@@ -171,9 +164,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
             }
 
             CartViewModel.CartUiState.Loading -> {
-                Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
-                }
+                Loading()
             }
             is CartViewModel.CartUiState.Nothing -> {
                 showErrorDialog.value=false
