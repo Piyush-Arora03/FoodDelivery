@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.modle.OrderItem
+import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.screens.orders.OrdersListViewModel
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.utils.UiState
@@ -65,7 +66,7 @@ fun OrderDetail(
         viewModel.getOrderDetails(orderId)
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        OrderDetailHeaderView(onBack = { viewModel.navigateBack() })
+        HeaderView( {navController.popBackStack()} ,"Order Detail")
 
         when (uiState) {
             is UiState.Loading -> {

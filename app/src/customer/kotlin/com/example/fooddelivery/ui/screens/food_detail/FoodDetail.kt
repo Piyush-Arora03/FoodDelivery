@@ -121,7 +121,7 @@ fun SharedTransitionScope.FoodDetail(
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = {
-                viewModel.addToCart(foodItem.restaurantId,foodItem.id)
+                viewModel.addToCart(foodItem.restaurantId,foodItem.id!!)
             },
             colors = ButtonDefaults.buttonColors(containerColor = Primary),
             modifier = Modifier

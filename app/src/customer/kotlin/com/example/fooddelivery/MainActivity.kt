@@ -48,6 +48,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -80,7 +81,7 @@ import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.screens.cart.CartScreen
 import com.example.fooddelivery.ui.screens.cart.CartViewModel
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetail
-import com.example.fooddelivery.ui.screens.home.HomeScreen
+import com.example.fooddelivery.ui.screens.home.CustomerHomeScreen
 import com.example.fooddelivery.ui.screens.home.HomeViewModel
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
@@ -178,7 +179,13 @@ class MainActivity : ComponentActivity() {
                                     Log.d(TAG, "notificationCount: $notificationCount cartCount: $cartCount")
                                     NavigationBarItem(
                                         selected = false,
-                                        onClick = {  navController.navigate(item.route)},
+                                        onClick = {  navController.navigate(item.route){
+                                            popUpTo(navController.graph.findStartDestination().id){
+                                                saveState=true
+                                            }
+                                            launchSingleTop=true
+                                            restoreState=true
+                                        } },
                                         icon = {
                                             Box(modifier = Modifier.size(48.dp)) {
                                                 if(item.route==BottomNavItems.Cart.route && cartCount.value>0)Box(
@@ -257,7 +264,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<HomeScreen> {
                                 showBottomNavSheet.value=true
-                                HomeScreen(navController=navController, animatedVisibilityScope = this)
+                                CustomerHomeScreen(navController=navController)
                             }
                             composable<LogInScreen> {
                                 showBottomNavSheet.value=false

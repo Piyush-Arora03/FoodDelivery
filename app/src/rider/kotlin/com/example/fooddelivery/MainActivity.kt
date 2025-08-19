@@ -48,6 +48,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -66,6 +67,7 @@ import com.example.fooddelivery.ui.CustomNavHost
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignInScreen
 import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
+import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
@@ -149,7 +151,13 @@ class MainActivity : ComponentActivity() {
                                     Log.d(TAG, "notificationCount: $notificationCount ")
                                     NavigationBarItem(
                                         selected = false,
-                                        onClick = {  navController.navigate(item.route)},
+                                        onClick = {  navController.navigate(item.route){
+                                            popUpTo(navController.graph.findStartDestination().id){
+                                                saveState=true
+                                            }
+                                            launchSingleTop=true
+                                            restoreState=true
+                                        } },
                                         icon = {
                                             Box(modifier = Modifier.size(48.dp)) {
                                                 if(item.route==BottomNavItems.Notification.route && notificationCount.value>0)Box(
@@ -215,7 +223,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable<HomeScreen> {
                                 showBottomNavSheet.value=true
-                                RestaurantHomeScreen(navController=navController, animatedVisibilityScope = this)
+                                HomeScreen(navController=navController)
                             }
                             composable<LogInScreen> {
                                 showBottomNavSheet.value=false

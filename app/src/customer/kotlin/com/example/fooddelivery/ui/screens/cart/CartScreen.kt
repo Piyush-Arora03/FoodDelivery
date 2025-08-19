@@ -55,6 +55,7 @@ import com.example.fooddelivery.data.modle.CheckoutDetails
 import com.example.fooddelivery.navigation.AddressListScreen
 import com.example.fooddelivery.navigation.OrderSuccessScreen
 import com.example.fooddelivery.ui.BasicDialog
+import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.screens.food_detail.FoodDetailViewModel
 import com.example.fooddelivery.ui.screens.food_detail.ItemCounter
 import com.example.fooddelivery.ui.theme.Primary
@@ -124,7 +125,7 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        CartHeaderView { navController.popBackStack() }
+        HeaderView( {navController.popBackStack()} ,"Cart")
         when (uiState.value) {is CartViewModel.CartUiState.Success -> {
                 val data = (uiState.value as CartViewModel.CartUiState.Success).cartResponse
                 LazyColumn(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -188,18 +189,6 @@ fun CartScreen(navController: NavController,viewModel: CartViewModel) {
     }
 }
 
-@Composable
-fun CartHeaderView(onBack:()->Unit){
-    Box(modifier = Modifier.fillMaxWidth()) {
-        IconButton(onClick = {onBack()}, modifier = Modifier
-            .padding(8.dp)
-            .align(Alignment.CenterStart)) {
-            Image(painter = painterResource(R.drawable.back_button), contentDescription = null, modifier = Modifier.size(60.dp))
-        }
-        Text(text = "Cart", modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.padding(8.dp))
-    }
-}
 @Composable
 fun CheckoutDetailView(checkoutDetails: CheckoutDetails){
     Column(modifier = Modifier
