@@ -1,5 +1,6 @@
 package com.example.fooddelivery.navigation
 
+import com.example.fooddelivery.data.modle.Customer
 import com.example.fooddelivery.data.modle.FoodItem
 import kotlinx.serialization.Serializable
 
@@ -54,3 +55,9 @@ data class RestaurantMenuItem(val restaurantId: String): NavRoutes
 
 @Serializable
 object AddMenu: NavRoutes
+
+@Serializable
+object RiderDeliveryItemScreen: NavRoutes
+
+@Serializable
+data class RiderOrderDetail(val orderId:String): NavRoutes

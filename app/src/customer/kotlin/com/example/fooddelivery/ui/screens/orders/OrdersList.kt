@@ -52,6 +52,7 @@ import com.example.fooddelivery.R
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.navigation.OrderDetailScreen
 import com.example.fooddelivery.ui.BasicDialog
+import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.screens.address_list.OnUiStateError
 import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.ui.theme.poppinsFontFamily
@@ -100,7 +101,7 @@ fun OrdersList(navController: NavController,viewModel: OrdersListViewModel= hilt
             val tabList= listOf("Upcoming","History")
             var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
             Column {
-                OrdersHeaderView { navController.popBackStack() }
+                HeaderView( {navController.popBackStack()} ,"My Orders")
                 TabRow(selectedTabIndex = selectedTabIndex,
                     modifier = Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(36.dp))
