@@ -25,6 +25,7 @@ import com.example.fooddelivery.data.modle.PaymentIntentResponse
 import com.example.fooddelivery.data.modle.Restaurant
 import com.example.fooddelivery.data.modle.RestaurantResponse
 import com.example.fooddelivery.data.modle.ReverseGeocodeRequest
+import com.example.fooddelivery.data.modle.RiderActiveDeliveries
 import com.example.fooddelivery.data.modle.RiderAvailableDeliveriesResponse
 import com.example.fooddelivery.data.modle.SignInRequest
 import com.example.fooddelivery.data.modle.SignUpRequest
@@ -137,4 +138,7 @@ interface FoodApi {
 
     @POST("/rider/deliveries/{orderId}/reject")
     suspend fun onDeliveryReject(@Path("orderId")id:String):Response<GenericMsgResponse>
+
+    @GET("/rider/deliveries/active")
+    suspend fun getActiveDeliveries(): Response<RiderActiveDeliveries>
 }

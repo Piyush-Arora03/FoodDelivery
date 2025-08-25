@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.data.modle.AvailableDeliveriesItem
 import com.example.fooddelivery.data.modle.RiderAvailableDeliveriesResponse
+import com.example.fooddelivery.navigation.RiderDeliveryItemScreen
 import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.HeaderView
@@ -74,7 +75,7 @@ fun HomeScreen(navController: NavController,viewModel: HomeViewModel= hiltViewMo
         when(uiState.value){
             is UiState.Empty ->{
                 EmptyState("No Available Deliveries","Go to Orders") {
-
+                    navController.navigate(RiderDeliveryItemScreen)
                 }
             }
             is UiState.Error -> {

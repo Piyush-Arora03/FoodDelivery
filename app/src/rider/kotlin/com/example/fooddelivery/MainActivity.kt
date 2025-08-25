@@ -53,15 +53,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.fooddelivery.data.FoodApi
 import com.example.fooddelivery.data.FoodHubAuthSession
+import com.example.fooddelivery.data.modle.Customer
+import com.example.fooddelivery.data.modle.RiderDeliveryItem
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.CartScreen
+import com.example.fooddelivery.navigation.CustomerNavType
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
 import com.example.fooddelivery.navigation.NotificationScreen
 import com.example.fooddelivery.navigation.OrdersListScreen
+import com.example.fooddelivery.navigation.RiderDeliveryItemScreen
+import com.example.fooddelivery.navigation.RiderOrderDetail
 import com.example.fooddelivery.navigation.SignUpScreen
 import com.example.fooddelivery.ui.CustomNavHost
 import com.example.fooddelivery.ui.screens.auth.AuthScreen
@@ -70,6 +76,8 @@ import com.example.fooddelivery.ui.screens.auth.signup.SignUpScreen
 import com.example.fooddelivery.ui.screens.home.HomeScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationScreen
 import com.example.fooddelivery.ui.screens.notification.NotificationViewModel
+import com.example.fooddelivery.ui.screens.order_detail.detail.RiderOrderDetailScreen
+import com.example.fooddelivery.ui.screens.order_detail.item.ItemScreen
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.ui.theme.Mustard
 import com.example.fooddelivery.ui.theme.Primary
@@ -79,7 +87,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -91,9 +101,8 @@ class MainActivity : ComponentActivity() {
 
     sealed class BottomNavItems(val route:NavRoutes,val icon:Int){
         object Home:BottomNavItems(HomeScreen,R.drawable.nav_home)
-        object Cart:BottomNavItems(CartScreen,R.drawable.nav_cart)
         object Notification:BottomNavItems(NotificationScreen,R.drawable.nav_notification)
-        object Orders:BottomNavItems(OrdersListScreen,R.drawable.ic_order)
+        object Orders:BottomNavItems(RiderDeliveryItemScreen,R.drawable.ic_order)
     }
     @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -133,7 +142,6 @@ class MainActivity : ComponentActivity() {
                 }
                 val bottomNavItems= listOf(
                     BottomNavItems.Home,
-                    BottomNavItems.Cart,
                     BottomNavItems.Notification,
                     BottomNavItems.Orders)
                 val navController= rememberNavController()
@@ -232,6 +240,17 @@ class MainActivity : ComponentActivity() {
                             composable<NotificationScreen> {
                                 showBottomNavSheet.value=true
                                 NotificationScreen(navController,notificationViewModel)
+                            }
+                            composable<RiderDeliveryItemScreen> {
+                                showBottomNavSheet.value=true
+                                ItemScreen(navController)
+                            }
+                            composable<RiderOrderDetail>(
+                                typeMap = mapOf(typeOf<Customer>() to CustomerNavType)
+                            ) {
+                                val orderId=it.toRoute<RiderOrderDetail>().orderId
+//                                val customer=it.toRoute<RiderOrderDetail>().customer
+                                RiderOrderDetailScreen(orderId,navController)
                             }
                         }
                     }

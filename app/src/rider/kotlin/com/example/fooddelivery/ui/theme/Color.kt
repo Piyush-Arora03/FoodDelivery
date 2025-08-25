@@ -19,3 +19,11 @@ val Green=Color(0xFF388E3C)
 val VLRed=Color(0xFFFFEBEE)
 
 val Red=Color(0xFFD32F2F)
+
+val Blue=Color(0xFF0078FA)
+
+val VLBlue=Color(0xFFC1D3F8)
+
+val Orange=Color(0xFFFE724C)
+
+val VLOrange=Color(0xFFFCDAD4)
