@@ -60,7 +60,6 @@ import com.example.fooddelivery.data.modle.Customer
 import com.example.fooddelivery.data.modle.RiderDeliveryItem
 import com.example.fooddelivery.navigation.AuthScreen
 import com.example.fooddelivery.navigation.CartScreen
-import com.example.fooddelivery.navigation.CustomerNavType
 import com.example.fooddelivery.navigation.HomeScreen
 import com.example.fooddelivery.navigation.LogInScreen
 import com.example.fooddelivery.navigation.NavRoutes
@@ -245,9 +244,8 @@ class MainActivity : ComponentActivity() {
                                 showBottomNavSheet.value=true
                                 ItemScreen(navController)
                             }
-                            composable<RiderOrderDetail>(
-                                typeMap = mapOf(typeOf<Customer>() to CustomerNavType)
-                            ) {
+                            composable<RiderOrderDetail> {
+                                showBottomNavSheet.value=false
                                 val orderId=it.toRoute<RiderOrderDetail>().orderId
 //                                val customer=it.toRoute<RiderOrderDetail>().customer
                                 RiderOrderDetailScreen(orderId,navController)

@@ -1,27 +1,24 @@
 package com.example.fooddelivery.data
 
 import android.content.Context
-import android.util.Log
-import androidx.credentials.CredentialOption
-import com.example.fooddelivery.location.LocationManager
+import com.example.fooddelivery.SocketServiceImpl
+import com.example.fooddelivery.data.repository.LocationUpdateSocketRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.internal.Contexts
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object AppModule {
     @Provides
     fun provideClient(session: FoodHubAuthSession,@ApplicationContext context:Context): OkHttpClient {
         return OkHttpClient.Builder()
@@ -61,5 +58,15 @@ object NetworkModule {
     @Provides
     fun getLocation(@ApplicationContext context: Context) : FusedLocationProviderClient{
         return LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    @Provides
+    fun getSocketService(): SocketService{
+        return SocketServiceImpl()
+    }
+
+    @Provides
+    fun provideSocketService(socketService: SocketService): LocationUpdateSocketRepository{
+        return LocationUpdateSocketRepository(socketService)
     }
 }
