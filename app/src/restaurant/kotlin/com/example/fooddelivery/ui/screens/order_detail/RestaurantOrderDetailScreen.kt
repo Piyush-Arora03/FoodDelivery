@@ -35,7 +35,9 @@ import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.Error
 import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.Loading
+import com.example.fooddelivery.ui.theme.Primary
 import com.example.fooddelivery.utils.UiState
+import com.stripe.android.model.Source
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -86,9 +88,10 @@ fun RestaurantOrderDetailScreen(
             is UiState.Success<*> -> {
                 val orderListState= (uiState.value as UiState.Success<*>).data as RestaurantOrderDetailViewModel.OrderDetailState
                 val order=orderListState.selectedOrder!!
+                val availableStatus=availableStatus(order.status)
                 OrderItemsCard(order)
                 Spacer(modifier = Modifier.padding(16.dp))
-                StatusUpdateCard(order.status,viewModel.types
+                StatusUpdateCard(order.status,availableStatus
                     .filter { it!=order.status }) {
                     viewModel.updateOrderStatus(orderId,it)
                 }
@@ -96,6 +99,16 @@ fun RestaurantOrderDetailScreen(
         }
     }
 
+}
+
+fun availableStatus(status: String):List<String>{
+    return when (status.uppercase()) {
+        "PENDING_ACCEPTANCE" -> listOf("ACCEPTED")
+        "ACCEPTED" -> listOf("PREPARING")
+        "PREPARING"->listOf("READY")
+        "READY"->listOf("REJECTED")
+        else -> emptyList()
+    }
 }
 
 @Composable
@@ -131,7 +144,7 @@ private fun OrderItemRow(item: OrderItem) {
             text = "${item.quantity} x",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary // Your app's blue
+            color = Primary // Your app's blue
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(

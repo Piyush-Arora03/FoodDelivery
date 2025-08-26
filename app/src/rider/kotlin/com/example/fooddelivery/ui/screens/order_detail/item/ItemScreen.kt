@@ -42,7 +42,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.fooddelivery.data.modle.Customer
 import com.example.fooddelivery.data.modle.RiderDeliveryData
-import com.example.fooddelivery.navigation.CustomerNavType
 import com.example.fooddelivery.navigation.RiderOrderDetail
 import com.example.fooddelivery.ui.EmptyState
 import com.example.fooddelivery.ui.Error

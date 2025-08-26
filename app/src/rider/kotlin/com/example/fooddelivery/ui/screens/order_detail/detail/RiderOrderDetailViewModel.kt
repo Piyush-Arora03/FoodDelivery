@@ -1,5 +1,6 @@
 package com.example.fooddelivery.ui.screens.order_detail.detail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddelivery.data.FoodApi
@@ -7,6 +8,7 @@ import com.example.fooddelivery.data.modle.GenericMsgResponse
 import com.example.fooddelivery.data.modle.Order
 import com.example.fooddelivery.data.remote.ApiResponses
 import com.example.fooddelivery.data.remote.SafeApiCalls
+import com.example.fooddelivery.data.repository.LocationUpdateSocketRepository
 import com.example.fooddelivery.utils.UiState
 import com.example.fooddelivery.utils.handleException
 import com.example.fooddelivery.utils.toError
@@ -22,7 +24,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RiderOrderDetailViewModel @Inject constructor(val foodApi: FoodApi): ViewModel() {
+class RiderOrderDetailViewModel @Inject constructor(val foodApi: FoodApi,
+    private val locationUpdateSocketRepository: LocationUpdateSocketRepository
+): ViewModel() {
     data class OrderDetailState(
         val selectedOrder: Order? = null,
         val updateStatusRes: GenericMsgResponse?=null
@@ -32,6 +36,24 @@ class RiderOrderDetailViewModel @Inject constructor(val foodApi: FoodApi): ViewM
 
     private val _navigationEvent= MutableSharedFlow<NavigationEvent>()
     val navigationEvent=_navigationEvent.asSharedFlow()
+
+    val message=locationUpdateSocketRepository.messages
+
+    fun connectSocket(riderId:String){
+        val currentState=(_uiState.value as? UiState.Success)?.data?:OrderDetailState()
+        val orderId=currentState.selectedOrder?.id.toString()
+        Log.d("RiderOrderDetailViewModel", "connectSocket: $orderId and OrderID ${riderId}")
+        locationUpdateSocketRepository.connect(
+            orderId,
+            riderId,
+        )
+    }
+
+    fun disconnect(){
+        locationUpdateSocketRepository.disconnect()
+    }
+
+
 
 
     fun getOrderDetails(orderId:String){
@@ -50,6 +72,10 @@ class RiderOrderDetailViewModel @Inject constructor(val foodApi: FoodApi): ViewM
                     is ApiResponses.Success<*> -> {
                         val currentState = (_uiState.value as? UiState.Success)?.data ?: OrderDetailState()
                         _uiState.toSuccess(currentState.copy(selectedOrder = it.data as Order))
+                        val order=it.data
+                        val riderId=order.riderId.toString()
+                        Log.d("RiderOrderDetailViewModel", "getOrderDetails: $riderId")
+                        connectSocket(riderId)
                     }
                 }
             }

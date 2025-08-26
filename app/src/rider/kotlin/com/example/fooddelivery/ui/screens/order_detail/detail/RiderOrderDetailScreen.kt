@@ -2,6 +2,7 @@ package com.example.fooddelivery.ui.screens.order_detail.detail
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fooddelivery.data.modle.Customer
 import com.example.fooddelivery.data.modle.OrderItem
@@ -58,6 +61,8 @@ import com.example.fooddelivery.ui.HeaderView
 import com.example.fooddelivery.ui.Loading
 import com.example.fooddelivery.utils.OrderStatusUtils
 import com.example.fooddelivery.utils.UiState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -116,8 +121,10 @@ fun RiderOrderDetailScreen(orderId:String, navController: NavController,viewMode
                         AnimatedVisibility(
                             visible = deliveryData.status == "OUT_FOR_DELIVERY",
                             enter = fadeIn() + slideInVertically(),
-                            exit = fadeOut() + slideOutVertically()
+                            exit = fadeOut() + slideOutVertically(),
                         ) {
+                            val messages=viewModel.message.collectAsStateWithLifecycle("")
+                            Log.d("Messages",messages.value)
                             MapPlaceholder()
                         }
                     }
@@ -170,21 +177,13 @@ fun RiderOrderDetailScreen(orderId:String, navController: NavController,viewMode
 
 @Composable
 private fun MapPlaceholder() {
-    Column {
-        Text(
-            "Live Route",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .background(Color.LightGray, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
+    Column() {
+        val cameraPositionState=rememberCameraPositionState()
+        GoogleMap(
+            modifier = Modifier.fillMaxWidth().height(500.dp),
+            cameraPositionState=cameraPositionState
         ) {
-            Text("Map with Directions API Route Would Be Here", color = Color.DarkGray)
+
         }
     }
 }
